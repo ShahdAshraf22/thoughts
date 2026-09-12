@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Thoughts</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Caveat:wght@400;500;600&family=Cairo:wght@400;500;600;700&family=Tajawal:wght@400;500;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+  <main class="book">
+
+    <!-- COVER -->
+
+    <section class="page cover active">
+
+      <div class="cover-small">
+        a little place for
+      </div>
+
+      <h1>
+        Thoughts
+      </h1>
+
+      <div class="cover-line"></div>
+
+      <div class="cover-bottom">
+        things I think about
+      </div>
+
+    </section>
+
+
+    <!-- INTRODUCTION -->
+
+    <section class="page introduction">
+
+      <div class="page-top">
+        <span>01</span>
+        <span>introduction</span>
+      </div>
+
+
+      <article class="text">
+
+        <p>
+          يمكن دي مجرد كتابات عبثية.
+        </p>
+
+        <p>
+          عربي، إنجليزي، فصحى، عامية، حاجات حصلت،
+          وحاجات محصلتش غير في دماغي.
+        </p>
+
+        <p>
+          مشاعري، ومشاعر مش بتاعتي.
+        </p>
+
+        <p>
+          حاجات حسيتها، وحاجات تخيلت إني حسيتها.
+        </p>
+
+        <p>
+          سيناريوهات عشتها وأنا قاعدة مكاني،
+          وتصرفات فضلت أـ overthink فيها أكتر مما تستحق.
+        </p>
+
+        <p>
+          بكتب كل ما أحس إن في دماغي حاجة حابة أكتبها،
+          أفكار بتيجي في أوقات عبثية، من غير ميعاد أو ترتيب.
+          ساعات بكتب كل يومين أو كل يوم، وساعات تانية ممكن
+          أختفي سنة أو سنتين وأرجع أكمل.
+        </p>
+
+        <p>
+          بحب الناس.
+        </p>
+
+        <p>
+          بحب نفسي.
+        </p>
+
+        <p>
+          وبحاول أكون طيبة معاها.
+        </p>
+
+        <p>
+          بحاول أكون نفسي، وبحاول مابقاش الشخص
+          اللي محبوش يكون ليا.
+        </p>
+
+        <p class="last-line">
+          وده كل اللي أعرفه عن الدفتر ده لحد دلوقتي.
+        </p>
+
+      </article>
+
+
+      <div class="page-number">
+        01
+      </div>
+
+    </section>
+
+
+    <!-- DYNAMIC WRITINGS -->
+
+    <div id="writings"></div>
+
+
+    <!-- ARCHIVE -->
+
+    <section class="archive-page page">
+
+      <div class="page-top">
+        <span>ARCHIVE</span>
+        <span>things I've written</span>
+      </div>
+
+
+      <div class="archive-content">
+
+        <h2>
+          Archive
+        </h2>
+
+
+        <div class="archive-search">
+
+          <input
+            type="search"
+            id="searchInput"
+            placeholder="ابحثي في الكتابات..."
+          >
+
+        </div>
+
+
+        <div id="archiveList"></div>
+
+      </div>
+
+
+      <div class="page-number">
+        ARCHIVE
+      </div>
+
+    </section>
+
+
+    <!-- NAVIGATION -->
+
+    <div class="navigation">
+
+      <button id="prev">
+        ←
+      </button>
+
+      <span id="counter">
+        1 / 2
+      </span>
+
+      <button id="next">
+        →
+      </button>
+
+    </div>
+
+  </main>
+
+
+  <script>
+
+    const writingsContainer =
+      document.getElementById(
+        "writings"
+      );
+
+
+    const nextButton =
+      document.getElementById(
+        "next"
+      );
+
+
+    const prevButton =
+      document.getElementById(
+        "prev"
+      );
+
+
+    const counter =
+      document.getElementById(
+        "counter"
+      );
+
+
+    const searchInput =
+      document.getElementById(
+        "searchInput"
+      );
+
+
+    let pages = [];
+
+    let currentPage = 0;
+
+
+    /* =========================
+       DATA
+    ========================= */
+
+    function getPublishedPages() {
+
+      const saved =
+        JSON.parse(
+          localStorage.getItem(
+            "thoughtsPages"
+          )
+        ) || [];
+
+
+      return saved.filter(
+        page =>
+          page.status ===
+          "published"
+      );
+
+    }
+
+
+    /* =========================
+       ESCAPE
+    ========================= */
+
+    function escapeHTML(value) {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.textContent =
+        value || "";
+
+      return div.innerHTML;
+
+    }
+
+
+    /* =========================
+       STYLE
+    ========================= */
+
+    function applyWritingStyle(
+      section,
+      style
+    ) {
+
+      const currentStyle = {
+        paperColor:
+          "#faf8f3",
+
+        textColor:
+          "#302b27",
+
+        fontFamily:
+          "Amiri",
+
+        pageStyle:
+          "soft",
+
+        ...(style || {})
+      };
+
+
+      section.style.backgroundColor =
+        currentStyle.paperColor;
+
+      section.style.color =
+        currentStyle.textColor;
+
+      section.style.fontFamily =
+        `"${currentStyle.fontFamily}", serif`;
+
+
+      if (
+        currentStyle.pageStyle ===
+        "clean"
+      ) {
+
+        section.style.boxShadow =
+          "none";
+
+      }
+
+      else if (
+        currentStyle.pageStyle ===
+        "shadow"
+      ) {
+
+        section.style.boxShadow =
+          "0 18px 45px rgba(40,30,20,.20)";
+
+      }
+
+      else if (
+        currentStyle.pageStyle ===
+        "dark"
+      ) {
+
+        section.style.backgroundColor =
+          "#292522";
+
+        section.style.color =
+          "#f4eee5";
+
+        section.style.boxShadow =
+          "0 18px 45px rgba(0,0,0,.18)";
+
+      }
+
+    }
+
+
+    /* =========================
+       RENDER WRITINGS
+    ========================= */
+
+    function renderWritings() {
+
+      writingsContainer.innerHTML =
+        "";
+
+
+      const writings =
+        getPublishedPages();
+
+
+      writings.forEach(
+        (writing, index) => {
+
+          const section =
+            document.createElement(
+              "section"
+            );
+
+
+          section.className =
+            "page writing";
+
+
+          section.dataset.id =
+            writing.id;
+
+
+          applyWritingStyle(
+            section,
+            writing.style
+          );
+
+
+          const fontFamily =
+            (
+              writing.style &&
+              writing.style.fontFamily
+            ) ||
+            "Amiri";
+
+
+          const textColor =
+            (
+              writing.style &&
+              writing.style.textColor
+            ) ||
+            "#302b27";
+
+
+          section.innerHTML =
+            `
+              <div class="page-top">
+
+                <span>
+                  ${String(
+                    index + 2
+                  ).padStart(2, "0")}
+                </span>
+
+                <span>
+                  writing no.
+                  ${String(
+                    index + 1
+                  ).padStart(2, "0")}
+                </span>
+
+              </div>
+
+
+              <div
+                class="date"
+                style="
+                  font-family:'${escapeHTML(fontFamily)}', serif;
+                  color:${escapeHTML(textColor)};
+                "
+              >
+                ${escapeHTML(
+                  writing.date || ""
+                )}
+              </div>
+
+
+              <h2
+                style="
+                  font-family:'${escapeHTML(fontFamily)}', serif;
+                  color:${escapeHTML(textColor)};
+                "
+              >
+                ${escapeHTML(
+                  writing.title ||
+                  "Untitled"
+                )}
+              </h2>
+
+
+              ${
+                writing.tags &&
+                writing.tags.length
+                  ?
+                  `
+                    <div class="writing-tags">
+
+                      ${writing.tags
+                        .map(
+                          tag =>
+                            `<span>
+                              #${escapeHTML(tag)}
+                            </span>`
+                        )
+                        .join("")}
+
+                    </div>
+                  `
+                  :
+                  ""
+              }
+
+
+              <article
+                class="text dynamic-content"
+                style="
+                  font-family:'${escapeHTML(fontFamily)}', serif;
+                  color:${escapeHTML(textColor)};
+                "
+              >
+                ${writing.content || ""}
+              </article>
+
+
+              <div class="page-number">
+                ${String(
+                  index + 2
+                ).padStart(2, "0")}
+              </div>
+            `;
+
+
+          writingsContainer.appendChild(
+            section
+          );
+
+        }
+      );
+
+    }
+
+
+    /* =========================
+       PAGES
+    ========================= */
+
+    function rebuildPages() {
+
+      renderWritings();
+
+
+      pages =
+        document.querySelectorAll(
+          ".page"
+        );
+
+
+      updateNavigation();
+
+    }
+
+
+    /* =========================
+       SHOW PAGE
+    ========================= */
+
+    function showPage(index) {
+
+      if (!pages.length) return;
+
+
+      if (index < 0) {
+        index = 0;
+      }
+
+
+      if (
+        index >= pages.length
+      ) {
+
+        index =
+          pages.length - 1;
+
+      }
+
+
+      currentPage =
+        index;
+
+
+      pages.forEach(
+        (page, i) => {
+
+          page.classList.toggle(
+            "active",
+            i === currentPage
+          );
+
+        }
+      );
+
+
+      counter.textContent =
+        `${currentPage + 1} / ${pages.length}`;
+
+
+      prevButton.disabled =
+        currentPage === 0;
+
+
+      nextButton.disabled =
+        currentPage ===
+        pages.length - 1;
+
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+
+
+    /* =========================
+       NAVIGATION
+    ========================= */
+
+    function updateNavigation() {
+
+      pages =
+        document.querySelectorAll(
+          ".page"
+        );
+
+
+      if (
+        !pages.length
+      ) return;
+
+
+      if (
+        currentPage >=
+        pages.length
+      ) {
+
+        currentPage =
+          pages.length - 1;
+
+      }
+
+
+      showPage(
+        currentPage
+      );
+
+    }
+
+
+    nextButton.addEventListener(
+      "click",
+      () => {
+
+        if (
+          currentPage <
+          pages.length - 1
+        ) {
+
+          showPage(
+            currentPage + 1
+          );
+
+        }
+
+      }
+    );
+
+
+    prevButton.addEventListener(
+      "click",
+      () => {
+
+        if (
+          currentPage > 0
+        ) {
+
+          showPage(
+            currentPage - 1
+          );
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       ARCHIVE
+    ========================= */
+
+    function renderArchive(
+      query = ""
+    ) {
+
+      const list =
+        document.getElementById(
+          "archiveList"
+        );
+
+
+      const writings =
+        getPublishedPages();
+
+
+      const search =
+        query
+          .trim()
+          .toLowerCase();
+
+
+      const filtered =
+        writings.filter(
+          page => {
+
+            const title =
+              (
+                page.title || ""
+              )
+                .toLowerCase();
+
+
+            const content =
+              (
+                page.content || ""
+              )
+                .toLowerCase();
+
+
+            const date =
+              (
+                page.date || ""
+              )
+                .toLowerCase();
+
+
+            const tags =
+              (
+                page.tags || []
+              )
+                .join(" ")
+                .toLowerCase();
+
+
+            return (
+              title.includes(search) ||
+              content.includes(search) ||
+              date.includes(search) ||
+              tags.includes(search)
+            );
+
+          }
+        );
+
+
+      if (!filtered.length) {
+
+        list.innerHTML =
+          `
+            <div class="empty-archive">
+              مفيش كتابات هنا لسه.
+            </div>
+          `;
+
+        return;
+
+      }
+
+
+      list.innerHTML =
+        "";
+
+
+      filtered.forEach(
+        page => {
+
+          const originalIndex =
+            writings.findIndex(
+              item =>
+                item.id ===
+                page.id
+            );
+
+
+          const item =
+            document.createElement(
+              "button"
+            );
+
+
+          item.className =
+            "archive-item";
+
+
+          item.innerHTML =
+            `
+              <span class="archive-number">
+                ${String(
+                  originalIndex + 1
+                ).padStart(2, "0")}
+              </span>
+
+              <span class="archive-title">
+                ${escapeHTML(
+                  page.title ||
+                  "Untitled"
+                )}
+              </span>
+
+              <span class="archive-date">
+                ${escapeHTML(
+                  page.date || ""
+                )}
+              </span>
+            `;
+
+
+          item.addEventListener(
+            "click",
+            () => {
+
+              showPage(
+                originalIndex + 2
+              );
+
+            }
+          );
+
+
+          list.appendChild(
+            item
+          );
+
+        }
+      );
+
+    }
+
+
+    searchInput.addEventListener(
+      "input",
+      () => {
+
+        renderArchive(
+          searchInput.value
+        );
+
+      }
+    );
+
+
+    /* =========================
+       KEYBOARD
+    ========================= */
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.target.tagName ===
+          "INPUT"
+        ) {
+          return;
+        }
+
+
+        if (
+          event.key ===
+          "ArrowRight"
+        ) {
+
+          if (
+            currentPage <
+            pages.length - 1
+          ) {
+
+            showPage(
+              currentPage + 1
+            );
+
+          }
+
+        }
+
+
+        if (
+          event.key ===
+          "ArrowLeft"
+        ) {
+
+          if (
+            currentPage > 0
+          ) {
+
+            showPage(
+              currentPage - 1
+            );
+
+          }
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       START
+    ========================= */
+
+    renderArchive();
+
+    rebuildPages();
+
+  </script>
+
+</body>
+
+</html>

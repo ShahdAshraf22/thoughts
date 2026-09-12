@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Thoughts — Editor</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700&family=Tajawal:wght@400;500;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Caveat:wght@400;500;600&family=Playfair+Display:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #eee9df;
+      color: #302b27;
+      font-family: "Amiri", serif;
+      padding: 30px;
+    }
+
+    /* =========================
+       TOP BAR
+    ========================= */
+
+    .topbar {
+      width: min(1100px, 100%);
+      margin: 0 auto 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo {
+      font-family: "Caveat", cursive;
+      font-size: 30px;
+    }
+
+    .editor-label {
+      font-size: 12px;
+      color: #9b8e82;
+      letter-spacing: 2px;
+      direction: ltr;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+    }
+
+    .new-page,
+    .preview-btn {
+      padding: 9px 17px;
+      border-radius: 4px;
+    }
+
+    .new-page {
+      background: #302b27;
+      color: white;
+    }
+
+    .preview-btn {
+      background: transparent;
+      color: #302b27;
+      border: 1px solid #cfc6ba;
+    }
+
+    /* =========================
+       TOOLBAR
+    ========================= */
+
+    .toolbar,
+    .appearance {
+      width: min(900px, 100%);
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .toolbar {
+      background: rgba(255, 255, 255, .65);
+      border: 1px solid rgba(60, 50, 40, .08);
+      padding: 9px;
+      gap: 6px;
+      border-radius: 5px 5px 0 0;
+    }
+
+    .tool {
+      background: transparent;
+      min-width: 34px;
+      height: 32px;
+      padding: 0 8px;
+      border-radius: 3px;
+    }
+
+    .tool:hover {
+      background: #e4ddd2;
+    }
+
+    .tool.active {
+      background: #d9cfc2;
+    }
+
+    .separator {
+      width: 1px;
+      height: 23px;
+      background: #d3cbc1;
+    }
+
+    select {
+      height: 32px;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      cursor: pointer;
+      color: #302b27;
+    }
+
+    .appearance {
+      background: rgba(255, 255, 255, .48);
+      border: 1px solid rgba(60, 50, 40, .08);
+      border-top: none;
+      padding: 10px 14px;
+      gap: 15px;
+      font-size: 13px;
+      color: #756b62;
+    }
+
+    .appearance-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .style-select {
+      background: rgba(255, 255, 255, .7);
+      border: 1px solid #d5ccc1;
+      border-radius: 4px;
+      padding: 3px 8px;
+    }
+
+    .color-picker {
+      width: 32px;
+      height: 27px;
+      border: 1px solid #cfc6ba;
+      border-radius: 4px;
+      padding: 2px;
+      cursor: pointer;
+    }
+
+    .reset-style {
+      background: transparent;
+      color: #9b8e82;
+      text-decoration: underline;
+    }
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    .meta-bar {
+      width: min(900px, 100%);
+      margin: 15px auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-select {
+      border: 1px solid #d4cbc1;
+      background: rgba(255, 255, 255, .65);
+      border-radius: 4px;
+      padding: 8px 12px;
+    }
+
+    .tags-input {
+      flex: 1;
+      min-width: 180px;
+      border: 1px solid #d4cbc1;
+      background: rgba(255, 255, 255, .65);
+      padding: 9px 12px;
+      border-radius: 4px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    /* =========================
+       PAPER
+    ========================= */
+
+    .paper-wrapper {
+      width: min(900px, 100%);
+      margin: auto;
+    }
+
+    .paper {
+      min-height: 950px;
+      background: #fdfbf7;
+      color: #302b27;
+      padding: 75px 90px 90px;
+      box-shadow:
+        0 8px 30px rgba(50, 40, 30, .12),
+        0 1px 3px rgba(0, 0, 0, .05);
+      position: relative;
+      transition:
+        background .3s,
+        color .3s,
+        box-shadow .3s;
+    }
+
+    /* =========================
+       DATE
+    ========================= */
+
+    .date {
+      text-align: center;
+      direction: ltr;
+      color: #a09184;
+      font-family: "Caveat", cursive;
+      font-size: 19px;
+      min-height: 30px;
+      outline: none;
+      margin-bottom: 35px;
+    }
+
+    .date:empty::before {
+      content: "date";
+      opacity: .45;
+    }
+
+    /* =========================
+       TITLE
+    ========================= */
+
+    .title {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1.5;
+      min-height: 55px;
+      outline: none;
+      margin-bottom: 45px;
+    }
+
+    .title:empty::before {
+      content: "عنوان الكتابة";
+      color: #c5bdb4;
+    }
+
+    /* =========================
+       CONTENT
+    ========================= */
+
+    .content {
+      min-height: 600px;
+      outline: none;
+      font-size: 22px;
+      line-height: 2.2;
+    }
+
+    .content:empty::before {
+      content: "اكتبي هنا...";
+      color: #c5bdb4;
+    }
+
+    .content img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 30px auto;
+    }
+
+    /* =========================
+       PAGE NUMBER
+    ========================= */
+
+    .page-number {
+      position: absolute;
+      bottom: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: "Caveat", cursive;
+      color: #aaa097;
+      font-size: 17px;
+    }
+
+    /* =========================
+       ACTIONS
+    ========================= */
+
+    .actions {
+      width: min(900px, 100%);
+      margin: 18px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .save {
+      background: #302b27;
+      color: white;
+      padding: 11px 25px;
+      border-radius: 4px;
+    }
+
+    .delete {
+      background: transparent;
+      color: #a36f65;
+    }
+
+    .saved-message {
+      color: #8d8176;
+      opacity: 0;
+      transition: .3s;
+    }
+
+    .saved-message.show {
+      opacity: 1;
+    }
+
+    /* =========================
+       PAGES
+    ========================= */
+
+    .pages {
+      width: min(900px, 100%);
+      margin: 45px auto;
+    }
+
+    .pages-title {
+      font-family: "Caveat", cursive;
+      font-size: 25px;
+      margin-bottom: 15px;
+      direction: ltr;
+    }
+
+    .page-search {
+      width: 100%;
+      margin-bottom: 15px;
+      border: 1px solid #d4cbc1;
+      background: rgba(255, 255, 255, .5);
+      padding: 10px 12px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .page-item {
+      background: rgba(255, 255, 255, .5);
+      border: 1px solid rgba(60, 50, 40, .07);
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 7px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .page-item:hover {
+      background: rgba(255, 255, 255, .8);
+    }
+
+    .page-info {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .page-index {
+      font-family: "Caveat", cursive;
+      color: #a49486;
+      direction: ltr;
+    }
+
+    .page-date {
+      color: #9c9187;
+      font-size: 13px;
+    }
+
+    .page-status {
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 10px;
+    }
+
+    .page-status.published {
+      background: #dfe9df;
+      color: #536653;
+    }
+
+    .page-status.draft {
+      background: #eee4d5;
+      color: #806f58;
+    }
+
+    .empty-pages {
+      color: #a79c92;
+    }
+
+    /* =========================
+       BACKUP
+    ========================= */
+
+    .backup {
+      width: min(900px, 100%);
+      margin: 35px auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(100, 90, 80, .15);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .backup button {
+      background: transparent;
+      border: 1px solid #d0c6bb;
+      padding: 8px 13px;
+      border-radius: 4px;
+      color: #756b62;
+    }
+
+    /* =========================
+       PREVIEW
+    ========================= */
+
+    body.preview-mode {
+      padding: 0;
+    }
+
+    body.preview-mode .topbar,
+    body.preview-mode .toolbar,
+    body.preview-mode .appearance,
+    body.preview-mode .meta-bar,
+    body.preview-mode .actions,
+    body.preview-mode .pages,
+    body.preview-mode .backup {
+      display: none;
+    }
+
+    body.preview-mode .paper-wrapper {
+      width: min(900px, 100%);
+      margin: auto;
+    }
+
+    body.preview-mode .paper {
+      min-height: 100vh;
+      box-shadow: none;
+    }
+
+    .exit-preview {
+      display: none;
+    }
+
+    body.preview-mode .exit-preview {
+      display: block;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      background: #302b27;
+      color: white;
+      padding: 9px 15px;
+      border-radius: 4px;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 700px) {
+
+      body {
+        padding: 15px;
+      }
+
+      .paper {
+        padding: 55px 25px 80px;
+        min-height: 750px;
+      }
+
+      .title {
+        font-size: 28px;
+      }
+
+      .content {
+        font-size: 19px;
+        line-height: 2.05;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+      }
+
+      .appearance {
+        justify-content: flex-start;
+      }
+
+      .page-item {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .page-info {
+        flex-wrap: wrap;
+      }
+
+      .actions {
+        gap: 15px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP -->
+
+  <header class="topbar">
+
+    <div>
+      <div class="logo">
+        Thoughts
+      </div>
+
+      <div class="editor-label">
+        EDITOR
+      </div>
+    </div>
+
+    <div class="top-actions">
+
+      <button
+        class="preview-btn"
+        onclick="togglePreview()"
+      >
+        Preview
+      </button>
+
+      <button
+        class="new-page"
+        onclick="newPage()"
+      >
+        + New Page
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- TOOLBAR -->
+
+  <div class="toolbar">
+
+    <button
+      class="tool"
+      onclick="format('bold')"
+      title="Bold"
+    >
+      <b>B</b>
+    </button>
+
+    <button
+      class="tool"
+      onclick="format('italic')"
+      title="Italic"
+    >
+      <i>I</i>
+    </button>
+
+    <button
+      class="tool"
+      onclick="format('underline')"
+      title="Underline"
+    >
+      <u>U</u>
+    </button>
+
+    <span class="separator"></span>
+
+    <select
+      onchange="changeFontSize(this.value)"
+    >
+      <option value="3">
+        حجم عادي
+      </option>
+
+      <option value="4">
+        كبير
+      </option>
+
+      <option value="5">
+        أكبر
+      </option>
+
+      <option value="6">
+        كبير جدًا
+      </option>
+    </select>
+
+    <span class="separator"></span>
+
+    <button
+      class="tool"
+      onclick="format('justifyRight')"
+    >
+      ☰
+    </button>
+
+    <button
+      class="tool"
+      onclick="format('justifyCenter')"
+    >
+      ≡
+    </button>
+
+    <button
+      class="tool"
+      onclick="format('justifyLeft')"
+    >
+      ☰
+    </button>
+
+    <span class="separator"></span>
+
+    <button
+      class="tool"
+      onclick="insertImage()"
+    >
+      🖼
+    </button>
+
+  </div>
+
+
+  <!-- APPEARANCE -->
+
+  <div class="appearance">
+
+    <div class="appearance-group">
+
+      <label>
+        الخط
+      </label>
+
+      <select
+        id="fontFamily"
+        class="style-select"
+        onchange="changeFontFamily(this.value)"
+      >
+        <option value="Amiri">
+          Amiri
+        </option>
+
+        <option value="Cairo">
+          Cairo
+        </option>
+
+        <option value="Tajawal">
+          Tajawal
+        </option>
+
+        <option value="Noto Naskh Arabic">
+          Noto Naskh Arabic
+        </option>
+
+        <option value="Caveat">
+          Caveat
+        </option>
+
+        <option value="Georgia">
+          Georgia
+        </option>
+      </select>
+
+    </div>
+
+
+    <div class="appearance-group">
+
+      <label>
+        لون الكتابة
+      </label>
+
+      <input
+        id="textColor"
+        class="color-picker"
+        type="color"
+        value="#302b27"
+        onchange="changeTextColor(this.value)"
+      >
+
+    </div>
+
+
+    <div class="appearance-group">
+
+      <label>
+        لون الورقة
+      </label>
+
+      <input
+        id="paperColor"
+        class="color-picker"
+        type="color"
+        value="#fdfbf7"
+        onchange="changePaperColor(this.value)"
+      >
+
+    </div>
+
+
+    <div class="appearance-group">
+
+      <label>
+        شكل الصفحة
+      </label>
+
+      <select
+        id="pageStyle"
+        class="style-select"
+        onchange="changePageStyle(this.value)"
+      >
+        <option value="soft">
+          Soft
+        </option>
+
+        <option value="clean">
+          Clean
+        </option>
+
+        <option value="shadow">
+          Shadow
+        </option>
+
+        <option value="dark">
+          Dark
+        </option>
+      </select>
+
+    </div>
+
+
+    <button
+      class="reset-style"
+      onclick="resetStyle()"
+    >
+      Reset
+    </button>
+
+  </div>
+
+
+  <!-- META -->
+
+  <div class="meta-bar">
+
+    <select
+      id="status"
+      class="status-select"
+    >
+      <option value="draft">
+        Draft
+      </option>
+
+      <option value="published">
+        Published
+      </option>
+    </select>
+
+
+    <input
+      id="tags"
+      class="tags-input"
+      type="text"
+      placeholder="Tags — مثال: thoughts, life, overthinking"
+    >
+
+  </div>
+
+
+  <!-- PAPER -->
+
+  <main class="paper-wrapper">
+
+    <section
+      class="paper"
+      id="paper"
+    >
+
+      <div
+        id="date"
+        class="date"
+        contenteditable="true"
+        spellcheck="false"
+      ></div>
+
+
+      <h1
+        id="title"
+        class="title"
+        contenteditable="true"
+        spellcheck="true"
+      ></h1>
+
+
+      <div
+        id="content"
+        class="content"
+        contenteditable="true"
+        spellcheck="true"
+      ></div>
+
+
+      <div
+        id="pageNumber"
+        class="page-number"
+      >
+        01
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- EXIT PREVIEW -->
+
+  <button
+    class="exit-preview"
+    onclick="togglePreview()"
+  >
+    Exit Preview
+  </button>
+
+
+  <!-- ACTIONS -->
+
+  <div class="actions">
+
+    <button
+      class="delete"
+      onclick="deleteCurrentPage()"
+    >
+      Delete page
+    </button>
+
+
+    <span
+      id="savedMessage"
+      class="saved-message"
+    >
+      Saved ✓
+    </span>
+
+
+    <button
+      class="save"
+      onclick="savePage()"
+    >
+      Save
+    </button>
+
+  </div>
+
+
+  <!-- SAVED PAGES -->
+
+  <section class="pages">
+
+    <h2 class="pages-title">
+      Your pages
+    </h2>
+
+
+    <input
+      id="pageSearch"
+      class="page-search"
+      type="search"
+      placeholder="Search your pages..."
+      oninput="displayPages(this.value)"
+    >
+
+
+    <div id="pagesList"></div>
+
+  </section>
+
+
+  <!-- BACKUP -->
+
+  <section class="backup">
+
+    <button onclick="exportBackup()">
+      Export Backup
+    </button>
+
+    <button
+      onclick="document.getElementById('restoreInput').click()"
+    >
+      Restore Backup
+    </button>
+
+    <input
+      id="restoreInput"
+      type="file"
+      accept=".json"
+      style="display:none"
+      onchange="restoreBackup(event)"
+    >
+
+  </section>
+
+
+  <script>
+
+    /* =========================
+       DATA
+    ========================= */
+
+    let pages =
+      JSON.parse(
+        localStorage.getItem("thoughtsPages")
+      ) || [];
+
+    let currentPageId = null;
+
+
+    /* =========================
+       DEFAULT STYLE
+    ========================= */
+
+    const defaultStyle = {
+      paperColor: "#fdfbf7",
+      textColor: "#302b27",
+      fontFamily: "Amiri",
+      pageStyle: "soft"
+    };
+
+
+    /* =========================
+       ELEMENTS
+    ========================= */
+
+    const date =
+      document.getElementById("date");
+
+    const title =
+      document.getElementById("title");
+
+    const content =
+      document.getElementById("content");
+
+    const paper =
+      document.getElementById("paper");
+
+    const status =
+      document.getElementById("status");
+
+    const tags =
+      document.getElementById("tags");
+
+
+    /* =========================
+       FORMAT
+    ========================= */
+
+    function format(command) {
+
+      content.focus();
+
+      document.execCommand(
+        command,
+        false,
+        null
+      );
+
+    }
+
+
+    /* =========================
+       FONT SIZE
+    ========================= */
+
+    function changeFontSize(size) {
+
+      content.focus();
+
+      document.execCommand(
+        "fontSize",
+        false,
+        size
+      );
+
+    }
+
+
+    /* =========================
+       IMAGE
+    ========================= */
+
+    function insertImage() {
+
+      const input =
+        document.createElement("input");
+
+      input.type = "file";
+      input.accept = "image/*";
+
+      input.onchange = event => {
+
+        const file =
+          event.target.files[0];
+
+        if (!file) return;
+
+        const reader =
+          new FileReader();
+
+        reader.onload = e => {
+
+          content.focus();
+
+          document.execCommand(
+            "insertImage",
+            false,
+            e.target.result
+          );
+
+          autoSave();
+
+        };
+
+        reader.readAsDataURL(file);
+
+      };
+
+      input.click();
+
+    }
+
+
+    /* =========================
+       FONT
+    ========================= */
+
+    function changeFontFamily(font) {
+
+      const family =
+        `"${font}", serif`;
+
+      content.style.fontFamily =
+        family;
+
+      title.style.fontFamily =
+        family;
+
+      date.style.fontFamily =
+        family;
+
+    }
+
+
+    /* =========================
+       TEXT COLOR
+    ========================= */
+
+    function changeTextColor(color) {
+
+      paper.style.color =
+        color;
+
+      content.style.color =
+        color;
+
+      title.style.color =
+        color;
+
+    }
+
+
+    /* =========================
+       PAPER COLOR
+    ========================= */
+
+    function changePaperColor(color) {
+
+      paper.style.backgroundColor =
+        color;
+
+    }
+
+
+    /* =========================
+       PAGE STYLE
+    ========================= */
+
+    function changePageStyle(style) {
+
+      paper.dataset.style =
+        style;
+
+      if (style === "soft") {
+
+        paper.style.boxShadow =
+          "0 8px 30px rgba(50,40,30,.12), 0 1px 3px rgba(0,0,0,.05)";
+
+      }
+
+      if (style === "clean") {
+
+        paper.style.boxShadow =
+          "none";
+
+      }
+
+      if (style === "shadow") {
+
+        paper.style.boxShadow =
+          "0 18px 45px rgba(40,30,20,.20)";
+
+      }
+
+      if (style === "dark") {
+
+        paper.style.backgroundColor =
+          "#292522";
+
+        paper.style.color =
+          "#f4eee5";
+
+        content.style.color =
+          "#f4eee5";
+
+        title.style.color =
+          "#f4eee5";
+
+      }
+
+    }
+
+
+    /* =========================
+       RESET
+    ========================= */
+
+    function resetStyle() {
+
+      paper.style.backgroundColor =
+        defaultStyle.paperColor;
+
+      paper.style.color =
+        defaultStyle.textColor;
+
+      content.style.color =
+        defaultStyle.textColor;
+
+      title.style.color =
+        defaultStyle.textColor;
+
+      paper.style.boxShadow =
+        "0 8px 30px rgba(50,40,30,.12), 0 1px 3px rgba(0,0,0,.05)";
+
+      paper.dataset.style =
+        "soft";
+
+      content.style.fontFamily =
+        '"Amiri", serif';
+
+      title.style.fontFamily =
+        '"Amiri", serif';
+
+      date.style.fontFamily =
+        '"Caveat", cursive';
+
+      document.getElementById(
+        "fontFamily"
+      ).value = "Amiri";
+
+      document.getElementById(
+        "textColor"
+      ).value = "#302b27";
+
+      document.getElementById(
+        "paperColor"
+      ).value = "#fdfbf7";
+
+      document.getElementById(
+        "pageStyle"
+      ).value = "soft";
+
+    }
+
+
+    /* =========================
+       GET STYLE
+    ========================= */
+
+    function getCurrentStyle() {
+
+      return {
+
+        paperColor:
+          document.getElementById(
+            "paperColor"
+          ).value,
+
+        textColor:
+          document.getElementById(
+            "textColor"
+          ).value,
+
+        fontFamily:
+          document.getElementById(
+            "fontFamily"
+          ).value,
+
+        pageStyle:
+          document.getElementById(
+            "pageStyle"
+          ).value
+
+      };
+
+    }
+
+
+    /* =========================
+       NEW PAGE
+    ========================= */
+
+    function newPage() {
+
+      currentPageId = null;
+
+      date.innerHTML = "";
+      title.innerHTML = "";
+      content.innerHTML = "";
+
+      status.value =
+        "draft";
+
+      tags.value =
+        "";
+
+      document.getElementById(
+        "pageNumber"
+      ).textContent =
+        String(
+          pages.length + 1
+        ).padStart(2, "0");
+
+      resetStyle();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+
+
+    /* =========================
+       SAVE
+    ========================= */
+
+    function savePage() {
+
+      const dateValue =
+        date.innerHTML.trim();
+
+      const titleValue =
+        title.innerHTML.trim();
+
+      const contentValue =
+        content.innerHTML.trim();
+
+      if (
+        !titleValue &&
+        !contentValue
+      ) {
+
+        alert(
+          "اكتبي حاجة الأول ❤️"
+        );
+
+        return;
+
+      }
+
+
+      const tagList =
+        tags.value
+          .split(",")
+          .map(tag => tag.trim())
+          .filter(Boolean);
+
+
+      const pageData = {
+
+        date: dateValue,
+
+        title: titleValue,
+
+        content: contentValue,
+
+        status:
+          status.value,
+
+        tags:
+          tagList,
+
+        style:
+          getCurrentStyle(),
+
+        updatedAt:
+          new Date().toISOString()
+
+      };
+
+
+      if (currentPageId === null) {
+
+        const newPageObject = {
+
+          id:
+            Date.now(),
+
+          ...pageData,
+
+          createdAt:
+            new Date().toISOString()
+
+        };
+
+        pages.push(
+          newPageObject
+        );
+
+        currentPageId =
+          newPageObject.id;
+
+      }
+
+      else {
+
+        const page =
+          pages.find(
+            p =>
+              p.id ===
+              currentPageId
+          );
+
+        if (page) {
+
+          Object.assign(
+            page,
+            pageData
+          );
+
+        }
+
+      }
+
+
+      localStorage.setItem(
+        "thoughtsPages",
+        JSON.stringify(pages)
+      );
+
+
+      updatePageNumber();
+
+      showSavedMessage();
+
+      displayPages();
+
+    }
+
+
+    /* =========================
+       UPDATE PAGE NUMBER
+    ========================= */
+
+    function updatePageNumber() {
+
+      const index =
+        pages.findIndex(
+          page =>
+            page.id ===
+            currentPageId
+        );
+
+      document.getElementById(
+        "pageNumber"
+      ).textContent =
+        String(
+          index >= 0
+            ? index + 1
+            : pages.length + 1
+        ).padStart(2, "0");
+
+    }
+
+
+    /* =========================
+       LOAD
+    ========================= */
+
+    function loadPage(id) {
+
+      const page =
+        pages.find(
+          p =>
+            p.id === id
+        );
+
+      if (!page) return;
+
+      currentPageId =
+        page.id;
+
+      date.innerHTML =
+        page.date || "";
+
+      title.innerHTML =
+        page.title || "";
+
+      content.innerHTML =
+        page.content || "";
+
+      status.value =
+        page.status || "draft";
+
+      tags.value =
+        (page.tags || [])
+          .join(", ");
+
+      applyStyle(
+        page.style ||
+        defaultStyle
+      );
+
+      updatePageNumber();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+
+
+    /* =========================
+       APPLY STYLE
+    ========================= */
+
+    function applyStyle(style) {
+
+      style =
+        Object.assign(
+          {},
+          defaultStyle,
+          style || {}
+        );
+
+
+      paper.style.backgroundColor =
+        style.paperColor;
+
+      paper.style.color =
+        style.textColor;
+
+      content.style.color =
+        style.textColor;
+
+      title.style.color =
+        style.textColor;
+
+      paper.dataset.style =
+        style.pageStyle;
+
+
+      content.style.fontFamily =
+        `"${style.fontFamily}", serif`;
+
+      title.style.fontFamily =
+        `"${style.fontFamily}", serif`;
+
+      date.style.fontFamily =
+        `"${style.fontFamily}", serif`;
+
+
+      document.getElementById(
+        "fontFamily"
+      ).value =
+        style.fontFamily;
+
+      document.getElementById(
+        "textColor"
+      ).value =
+        style.textColor;
+
+      document.getElementById(
+        "paperColor"
+      ).value =
+        style.paperColor;
+
+      document.getElementById(
+        "pageStyle"
+      ).value =
+        style.pageStyle;
+
+
+      if (
+        style.pageStyle === "clean"
+      ) {
+
+        paper.style.boxShadow =
+          "none";
+
+      }
+
+      else if (
+        style.pageStyle === "shadow"
+      ) {
+
+        paper.style.boxShadow =
+          "0 18px 45px rgba(40,30,20,.20)";
+
+      }
+
+      else if (
+        style.pageStyle === "dark"
+      ) {
+
+        paper.style.backgroundColor =
+          "#292522";
+
+        paper.style.color =
+          "#f4eee5";
+
+        content.style.color =
+          "#f4eee5";
+
+        title.style.color =
+          "#f4eee5";
+
+        paper.style.boxShadow =
+          "0 18px 45px rgba(0,0,0,.25)";
+
+      }
+
+      else {
+
+        paper.style.boxShadow =
+          "0 8px 30px rgba(50,40,30,.12), 0 1px 3px rgba(0,0,0,.05)";
+
+      }
+
+    }
+
+
+    /* =========================
+       DELETE
+    ========================= */
+
+    function deleteCurrentPage() {
+
+      if (
+        currentPageId === null
+      ) {
+
+        alert(
+          "مفيش صفحة محفوظة للحذف."
+        );
+
+        return;
+
+      }
+
+
+      const confirmed =
+        confirm(
+          "متأكدة إنك عايزة تمسحي الصفحة دي؟"
+        );
+
+      if (!confirmed) return;
+
+
+      pages =
+        pages.filter(
+          p =>
+            p.id !==
+            currentPageId
+        );
+
+
+      localStorage.setItem(
+        "thoughtsPages",
+        JSON.stringify(pages)
+      );
+
+
+      newPage();
+
+      displayPages();
+
+    }
+
+
+    /* =========================
+       DISPLAY PAGES
+    ========================= */
+
+    function displayPages(query = "") {
+
+      const list =
+        document.getElementById(
+          "pagesList"
+        );
+
+      list.innerHTML = "";
+
+
+      const search =
+        query
+          .trim()
+          .toLowerCase();
+
+
+      const filtered =
+        pages.filter(page => {
+
+          const text = [
+
+            page.title || "",
+
+            page.date || "",
+
+            page.content || "",
+
+            ...(page.tags || [])
+
+          ]
+            .join(" ")
+            .toLowerCase();
+
+
+          return text.includes(
+            search
+          );
+
+        });
+
+
+      if (!filtered.length) {
+
+        list.innerHTML =
+          `
+            <div class="empty-pages">
+              لسه مفيش صفحات محفوظة.
+            </div>
+          `;
+
+        return;
+
+      }
+
+
+      filtered.forEach(page => {
+
+        const originalIndex =
+          pages.indexOf(page);
+
+
+        const item =
+          document.createElement(
+            "div"
+          );
+
+        item.className =
+          "page-item";
+
+
+        item.onclick =
+          () =>
+            loadPage(
+              page.id
+            );
+
+
+        const statusClass =
+          page.status ===
+          "published"
+            ? "published"
+            : "draft";
+
+
+        const statusText =
+          page.status ===
+          "published"
+            ? "Published"
+            : "Draft";
+
+
+        item.innerHTML =
+          `
+            <div class="page-info">
+
+              <span class="page-index">
+                ${String(
+                  originalIndex + 1
+                ).padStart(2, "0")}
+              </span>
+
+              <strong>
+                ${escapeHTML(
+                  page.title ||
+                  "بدون عنوان"
+                )}
+              </strong>
+
+              <span
+                class="page-status ${statusClass}"
+              >
+                ${statusText}
+              </span>
+
+            </div>
+
+            <span class="page-date">
+              ${escapeHTML(
+                page.date || ""
+              )}
+            </span>
+          `;
+
+
+        list.appendChild(
+          item
+        );
+
+      });
+
+    }
+
+
+    /* =========================
+       ESCAPE HTML
+    ========================= */
+
+    function escapeHTML(value) {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.textContent =
+        value || "";
+
+      return div.innerHTML;
+
+    }
+
+
+    /* =========================
+       SAVED MESSAGE
+    ========================= */
+
+    function showSavedMessage() {
+
+      const message =
+        document.getElementById(
+          "savedMessage"
+        );
+
+
+      message.classList.add(
+        "show"
+      );
+
+
+      setTimeout(
+        () => {
+
+          message.classList.remove(
+            "show"
+          );
+
+        },
+        1800
+      );
+
+    }
+
+
+    /* =========================
+       AUTO SAVE
+    ========================= */
+
+    let autoSaveTimer;
+
+
+    function autoSave() {
+
+      clearTimeout(
+        autoSaveTimer
+      );
+
+
+      autoSaveTimer =
+        setTimeout(
+          () => {
+
+            if (
+              title.innerHTML.trim() ||
+              content.innerHTML.trim()
+            ) {
+
+              savePage();
+
+            }
+
+          },
+          1500
+        );
+
+    }
+
+
+    [
+      date,
+      title,
+      content,
+      tags
+    ].forEach(element => {
+
+      element.addEventListener(
+        "input",
+        autoSave
+      );
+
+    });
+
+
+    /* =========================
+       PREVIEW
+    ========================= */
+
+    function togglePreview() {
+
+      document.body.classList.toggle(
+        "preview-mode"
+      );
+
+    }
+
+
+    /* =========================
+       ESCAPE
+    ========================= */
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key === "Escape" &&
+          document.body.classList.contains(
+            "preview-mode"
+          )
+        ) {
+
+          togglePreview();
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       EXPORT BACKUP
+    ========================= */
+
+    function exportBackup() {
+
+      const data =
+        JSON.stringify(
+          pages,
+          null,
+          2
+        );
+
+
+      const blob =
+        new Blob(
+          [data],
+          {
+            type:
+              "application/json"
+          }
+        );
+
+
+      const url =
+        URL.createObjectURL(
+          blob
+        );
+
+
+      const a =
+        document.createElement(
+          "a"
+        );
+
+
+      a.href =
+        url;
+
+      a.download =
+        "thoughts-backup.json";
+
+
+      a.click();
+
+
+      URL.revokeObjectURL(
+        url
+      );
+
+    }
+
+
+    /* =========================
+       RESTORE BACKUP
+    ========================= */
+
+    function restoreBackup(event) {
+
+      const file =
+        event.target.files[0];
+
+      if (!file) return;
+
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        e => {
+
+          try {
+
+            const imported =
+              JSON.parse(
+                e.target.result
+              );
+
+
+            if (
+              !Array.isArray(
+                imported
+              )
+            ) {
+
+              throw new Error();
+
+            }
+
+
+            const confirmed =
+              confirm(
+                "استرجاع النسخة الاحتياطية هيستبدل الصفحات الحالية. متأكدة؟"
+              );
+
+
+            if (!confirmed) return;
+
+
+            pages =
+              imported;
+
+
+            localStorage.setItem(
+              "thoughtsPages",
+              JSON.stringify(
+                pages
+              )
+            );
+
+
+            newPage();
+
+            displayPages();
+
+
+            alert(
+              "تم استرجاع النسخة بنجاح ❤️"
+            );
+
+          }
+
+          catch {
+
+            alert(
+              "ملف النسخة الاحتياطية غير صالح."
+            );
+
+          }
+
+        };
+
+
+      reader.readAsText(
+        file
+      );
+
+
+      event.target.value = "";
+
+    }
+
+
+    /* =========================
+       START
+    ========================= */
+
+    displayPages();
+
+    resetStyle();
+
+    newPage();
+
+  </script>
+
+</body>
+
+</html>

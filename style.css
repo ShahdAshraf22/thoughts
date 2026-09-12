@@ -1,0 +1,706 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(255,255,255,.8),
+      transparent 30%
+    ),
+    #eee9df;
+
+  color: #302c29;
+
+  font-family:
+    "Amiri",
+    serif;
+
+  display: flex;
+  justify-content: center;
+
+  padding: 30px 20px;
+}
+
+.book {
+  width: min(720px, 100%);
+}
+
+.page {
+  display: none;
+
+  position: relative;
+
+  width: 100%;
+  min-height: 720px;
+
+  background: #faf8f3;
+
+  padding: 70px 75px;
+
+  box-shadow:
+    0 15px 40px
+    rgba(55,45,35,.12);
+
+  border-radius: 3px;
+
+  animation:
+    openPage .45s ease;
+}
+
+.page.active {
+  display: block;
+}
+
+@keyframes openPage {
+
+  from {
+    opacity: 0;
+    transform:
+      rotateY(-8deg);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      rotateY(0);
+  }
+
+}
+
+/* =========================
+   COVER
+========================= */
+
+.cover {
+  min-height: 720px;
+
+  flex-direction:
+    column;
+
+  justify-content:
+    center;
+
+  align-items:
+    center;
+
+  text-align:
+    center;
+
+  background:
+    linear-gradient(
+      145deg,
+      #fbfaf6,
+      #f3eee5
+    );
+}
+
+.cover.active {
+  display: flex;
+}
+
+.cover-small {
+  font-family:
+    "Caveat",
+    cursive;
+
+  font-size:
+    20px;
+
+  color:
+    #9b8f84;
+
+  margin-bottom:
+    15px;
+}
+
+.cover h1 {
+  font-family:
+    "Caveat",
+    cursive;
+
+  font-size:
+    clamp(75px, 12vw, 115px);
+
+  font-weight:
+    400;
+
+  letter-spacing:
+    2px;
+
+  color:
+    #2e2a27;
+}
+
+.cover-line {
+  width:
+    55px;
+
+  height:
+    1px;
+
+  background:
+    #b7aaa0;
+
+  margin:
+    22px 0;
+}
+
+.cover-bottom {
+  font-family:
+    "Caveat",
+    cursive;
+
+  font-size:
+    18px;
+
+  color:
+    #a3978c;
+}
+
+/* =========================
+   PAGE TOP
+========================= */
+
+.page-top {
+  display:
+    flex;
+
+  justify-content:
+    space-between;
+
+  align-items:
+    center;
+
+  direction:
+    ltr;
+
+  font-family:
+    "Caveat",
+    cursive;
+
+  font-size:
+    17px;
+
+  color:
+    #a69a90;
+
+  padding-bottom:
+    14px;
+
+  border-bottom:
+    1px solid
+    rgba(120,110,100,.15);
+
+  margin-bottom:
+    45px;
+}
+
+/* =========================
+   TEXT
+========================= */
+
+.text {
+  direction:
+    rtl;
+}
+
+.text p {
+  font-size:
+    21px;
+
+  line-height:
+    2.05;
+
+  margin-bottom:
+    23px;
+
+  color:
+    #3c3733;
+}
+
+.introduction .text {
+  max-width:
+    580px;
+
+  margin:
+    auto;
+}
+
+.introduction .text p {
+  margin-bottom:
+    20px;
+}
+
+.last-line {
+  margin-top:
+    40px;
+
+  color:
+    #756960 !important;
+}
+
+/* =========================
+   WRITING
+========================= */
+
+.date {
+  direction:
+    ltr;
+
+  text-align:
+    left;
+
+  font-family:
+    "Caveat",
+    cursive;
+
+  font-size:
+    18px;
+
+  color:
+    #a49387;
+
+  margin-bottom:
+    35px;
+}
+
+.writing h2 {
+  font-size:
+    34px;
+
+  font-weight:
+    400;
+
+  margin-bottom:
+    25px;
+
+  color:
+    #302b27;
+
+  line-height:
+    1.5;
+}
+
+.writing .text {
+  max-width:
+    580px;
+
+  margin:
+    auto;
+}
+
+.dynamic-content {
+  white-space:
+    normal;
+}
+
+.dynamic-content p {
+  margin-bottom:
+    23px;
+}
+
+.dynamic-content img {
+  max-width:
+    100%;
+
+  height:
+    auto;
+
+  display:
+    block;
+
+  margin:
+    30px auto;
+}
+
+.dynamic-content blockquote {
+  margin:
+    30px 0;
+
+  padding-right:
+    20px;
+
+  border-right:
+    2px solid
+    #c9beb3;
+
+  color:
+    #756960;
+
+  font-style:
+    italic;
+}
+
+.writing-tags {
+  display:
+    flex;
+
+  gap:
+    8px;
+
+  flex-wrap:
+    wrap;
+
+  margin-bottom:
+    35px;
+
+  direction:
+    ltr;
+}
+
+.writing-tags span {
+  font-family:
+    "Caveat",
+    cursive;
+
+  color:
+    #9b8f84;
+
+  font-size:
+    15px;
+}
+
+/* =========================
+   PAGE NUMBER
+========================= */
+
+.page-number {
+  position:
+    absolute;
+
+  bottom:
+    30px;
+
+  left:
+    50%;
+
+  transform:
+    translateX(-50%);
+
+  font-family:
+    "Caveat",
+    cursive;
+
+  font-size:
+    16px;
+
+  color:
+    #b3a79d;
+}
+
+/* =========================
+   ARCHIVE
+========================= */
+
+.archive-page {
+  min-height:
+    720px;
+}
+
+.archive-content {
+  max-width:
+    580px;
+
+  margin:
+    auto;
+}
+
+.archive-content h2 {
+  font-family:
+    "Caveat",
+    cursive;
+
+  font-size:
+    42px;
+
+  font-weight:
+    400;
+
+  direction:
+    ltr;
+
+  margin-bottom:
+    30px;
+}
+
+.archive-search {
+  margin-bottom:
+    25px;
+}
+
+.archive-search input {
+  width:
+    100%;
+
+  border:
+    none;
+
+  border-bottom:
+    1px solid
+    #d4cbc1;
+
+  background:
+    transparent;
+
+  padding:
+    10px 3px;
+
+  outline:
+    none;
+
+  font-family:
+    "Amiri",
+    serif;
+
+  font-size:
+    17px;
+
+  color:
+    #302b27;
+}
+
+.archive-search input::placeholder {
+  color:
+    #aaa097;
+}
+
+.archive-item {
+  width:
+    100%;
+
+  border:
+    none;
+
+  border-bottom:
+    1px solid
+    rgba(100,90,80,.12);
+
+  background:
+    transparent;
+
+  padding:
+    16px 5px;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    45px 1fr auto;
+
+  gap:
+    15px;
+
+  align-items:
+    center;
+
+  cursor:
+    pointer;
+
+  text-align:
+    right;
+
+  font-family:
+    "Amiri",
+    serif;
+
+  transition:
+    .2s;
+}
+
+.archive-item:hover {
+  padding-right:
+    12px;
+}
+
+.archive-number {
+  font-family:
+    "Caveat",
+    cursive;
+
+  color:
+    #a49486;
+
+  direction:
+    ltr;
+}
+
+.archive-title {
+  font-size:
+    18px;
+
+  color:
+    #3c3733;
+}
+
+.archive-date {
+  font-family:
+    "Caveat",
+    cursive;
+
+  font-size:
+    15px;
+
+  color:
+    #a49486;
+
+  direction:
+    ltr;
+}
+
+.empty-archive {
+  color:
+    #a79c92;
+
+  text-align:
+    center;
+
+  padding:
+    40px 0;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.navigation {
+  display:
+    flex;
+
+  justify-content:
+    center;
+
+  align-items:
+    center;
+
+  gap:
+    25px;
+
+  margin-top:
+    22px;
+
+  direction:
+    ltr;
+}
+
+.navigation button {
+  border:
+    none;
+
+  background:
+    transparent;
+
+  font-size:
+    22px;
+
+  color:
+    #81756c;
+
+  cursor:
+    pointer;
+
+  transition:
+    .2s;
+}
+
+.navigation button:hover {
+  color:
+    #302c29;
+
+  transform:
+    scale(1.15);
+}
+
+.navigation button:disabled {
+  opacity:
+    .25;
+
+  cursor:
+    default;
+
+  transform:
+    none;
+}
+
+#counter {
+  font-family:
+    "Caveat",
+    cursive;
+
+  color:
+    #9a8d82;
+
+  font-size:
+    16px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+  body {
+    padding:
+      15px 10px;
+  }
+
+  .book {
+    width:
+      100%;
+  }
+
+  .page {
+    min-height:
+      650px;
+
+    padding:
+      50px 28px;
+  }
+
+  .cover {
+    min-height:
+      650px;
+  }
+
+  .cover h1 {
+    font-size:
+      80px;
+  }
+
+  .text p {
+    font-size:
+      18px;
+
+    line-height:
+      2;
+
+    margin-bottom:
+      20px;
+  }
+
+  .writing h2 {
+    font-size:
+      28px;
+  }
+
+  .archive-item {
+    grid-template-columns:
+      35px 1fr;
+  }
+
+  .archive-date {
+    grid-column:
+      2;
+  }
+
+}
