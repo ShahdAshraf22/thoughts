@@ -13,12 +13,7 @@
   <title>Thoughts</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link
     href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Caveat:wght@400;500;600&family=Cairo:wght@400;500;600;700&family=Tajawal:wght@400;500;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
@@ -28,6 +23,7 @@
   <link rel="stylesheet" href="style.css">
 
 </head>
+
 
 <body>
 
@@ -59,8 +55,15 @@
     <section class="page introduction">
 
       <div class="page-top">
-        <span>01</span>
-        <span>introduction</span>
+
+        <span>
+          01
+        </span>
+
+        <span>
+          introduction
+        </span>
+
       </div>
 
 
@@ -71,8 +74,7 @@
         </p>
 
         <p>
-          عربي، إنجليزي، فصحى، عامية، حاجات حصلت،
-          وحاجات محصلتش غير في دماغي.
+          عربي، إنجليزي، فصحى، عامية، حاجات حصلت، وحاجات محصلتش غير في دماغي.
         </p>
 
         <p>
@@ -84,15 +86,11 @@
         </p>
 
         <p>
-          سيناريوهات عشتها وأنا قاعدة مكاني،
-          وتصرفات فضلت أـ overthink فيها أكتر مما تستحق.
+          سيناريوهات عشتها وأنا قاعدة مكاني، وتصرفات فضلت أـ overthink فيها أكتر مما تستحق.
         </p>
 
         <p>
-          بكتب كل ما أحس إن في دماغي حاجة حابة أكتبها،
-          أفكار بتيجي في أوقات عبثية، من غير ميعاد أو ترتيب.
-          ساعات بكتب كل يومين أو كل يوم، وساعات تانية ممكن
-          أختفي سنة أو سنتين وأرجع أكمل.
+          بكتب كل ما أحس إن في دماغي حاجة حابة أكتبها، أفكار بتيجي في أوقات عبثية، من غير ميعاد أو ترتيب. ساعات بكتب كل يومين أو كل يوم، وساعات تانية ممكن أختفي سنة أو سنتين وأرجع أكمل.
         </p>
 
         <p>
@@ -108,8 +106,7 @@
         </p>
 
         <p>
-          بحاول أكون نفسي، وبحاول مابقاش الشخص
-          اللي محبوش يكون ليا.
+          بحاول أكون نفسي، وبحاول مابقاش الشخص اللي محبوش يكون ليا.
         </p>
 
         <p class="last-line">
@@ -126,7 +123,7 @@
     </section>
 
 
-    <!-- DYNAMIC WRITINGS -->
+    <!-- WRITINGS -->
 
     <div id="writings"></div>
 
@@ -136,8 +133,15 @@
     <section class="archive-page page">
 
       <div class="page-top">
-        <span>ARCHIVE</span>
-        <span>things I've written</span>
+
+        <span>
+          ARCHIVE
+        </span>
+
+        <span>
+          things I've written
+        </span>
+
       </div>
 
 
@@ -192,76 +196,70 @@
   </main>
 
 
+  <!-- SUPABASE -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
   <script>
 
-    const writingsContainer =
-      document.getElementById(
-        "writings"
+    /* =========================================================
+       SUPABASE
+    ========================================================= */
+
+    const SUPABASE_URL =
+      "https://fytuxwmmbguombjidbvb.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_mw6HCU-bobHuYZZ5AMd9HQ_cOzXLeXY";
+
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
       );
 
+
+    /* =========================================================
+       ELEMENTS
+    ========================================================= */
+
+    const writingsContainer =
+      document.getElementById("writings");
 
     const nextButton =
-      document.getElementById(
-        "next"
-      );
-
+      document.getElementById("next");
 
     const prevButton =
-      document.getElementById(
-        "prev"
-      );
-
+      document.getElementById("prev");
 
     const counter =
-      document.getElementById(
-        "counter"
-      );
-
+      document.getElementById("counter");
 
     const searchInput =
-      document.getElementById(
-        "searchInput"
-      );
+      document.getElementById("searchInput");
 
+
+    /* =========================================================
+       STATE
+    ========================================================= */
+
+    let publishedPages = [];
 
     let pages = [];
 
     let currentPage = 0;
 
 
-    /* =========================
-       DATA
-    ========================= */
-
-    function getPublishedPages() {
-
-      const saved =
-        JSON.parse(
-          localStorage.getItem(
-            "thoughtsPages"
-          )
-        ) || [];
-
-
-      return saved.filter(
-        page =>
-          page.status ===
-          "published"
-      );
-
-    }
-
-
-    /* =========================
-       ESCAPE
-    ========================= */
+    /* =========================================================
+       HELPERS
+    ========================================================= */
 
     function escapeHTML(value) {
 
       const div =
-        document.createElement(
-          "div"
-        );
+        document.createElement("div");
 
       div.textContent =
         value || "";
@@ -271,45 +269,40 @@
     }
 
 
-    /* =========================
-       STYLE
-    ========================= */
-
     function applyWritingStyle(
       section,
       style
     ) {
 
       const currentStyle = {
-        paperColor:
-          "#faf8f3",
 
-        textColor:
-          "#302b27",
+        paperColor: "#faf8f3",
 
-        fontFamily:
-          "Amiri",
+        textColor: "#302b27",
 
-        pageStyle:
-          "soft",
+        fontFamily: "Amiri",
+
+        pageStyle: "soft",
 
         ...(style || {})
+
       };
 
 
       section.style.backgroundColor =
         currentStyle.paperColor;
 
+
       section.style.color =
         currentStyle.textColor;
+
 
       section.style.fontFamily =
         `"${currentStyle.fontFamily}", serif`;
 
 
       if (
-        currentStyle.pageStyle ===
-        "clean"
+        currentStyle.pageStyle === "clean"
       ) {
 
         section.style.boxShadow =
@@ -317,9 +310,9 @@
 
       }
 
+
       else if (
-        currentStyle.pageStyle ===
-        "shadow"
+        currentStyle.pageStyle === "shadow"
       ) {
 
         section.style.boxShadow =
@@ -327,9 +320,9 @@
 
       }
 
+
       else if (
-        currentStyle.pageStyle ===
-        "dark"
+        currentStyle.pageStyle === "dark"
       ) {
 
         section.style.backgroundColor =
@@ -346,27 +339,85 @@
     }
 
 
-    /* =========================
+    /* =========================================================
+       LOAD PUBLISHED WRITINGS
+    ========================================================= */
+
+    async function loadPublishedPages() {
+
+      const {
+        data,
+        error
+      } = await supabaseClient
+
+        .from("thoughts")
+
+        .select("*")
+
+        .eq(
+          "status",
+          "published"
+        )
+
+        .order(
+          "created_at",
+          {
+            ascending: true
+          }
+        );
+
+
+      if (error) {
+
+        console.error(
+          "Supabase error:",
+          error
+        );
+
+        writingsContainer.innerHTML = `
+          <section class="page writing">
+            <article class="text">
+              <p>
+                حصلت مشكلة في تحميل الكتابات.
+              </p>
+            </article>
+          </section>
+        `;
+
+        rebuildPages();
+
+        return;
+
+      }
+
+
+      publishedPages =
+        data || [];
+
+
+      renderWritings();
+
+      renderArchive();
+
+      rebuildPages();
+
+    }
+
+
+    /* =========================================================
        RENDER WRITINGS
-    ========================= */
+    ========================================================= */
 
     function renderWritings() {
 
-      writingsContainer.innerHTML =
-        "";
+      writingsContainer.innerHTML = "";
 
 
-      const writings =
-        getPublishedPages();
-
-
-      writings.forEach(
+      publishedPages.forEach(
         (writing, index) => {
 
           const section =
-            document.createElement(
-              "section"
-            );
+            document.createElement("section");
 
 
           section.className =
@@ -387,104 +438,105 @@
             (
               writing.style &&
               writing.style.fontFamily
-            ) ||
-            "Amiri";
+            ) || "Amiri";
 
 
           const textColor =
             (
               writing.style &&
               writing.style.textColor
-            ) ||
-            "#302b27";
+            ) || "#302b27";
 
 
-          section.innerHTML =
-            `
-              <div class="page-top">
+          section.innerHTML = `
 
-                <span>
-                  ${String(
-                    index + 2
-                  ).padStart(2, "0")}
-                </span>
+            <div class="page-top">
 
-                <span>
-                  writing no.
-                  ${String(
-                    index + 1
-                  ).padStart(2, "0")}
-                </span>
+              <span>
+                ${String(index + 2).padStart(2, "0")}
+              </span>
 
-              </div>
+              <span>
+                writing no. ${String(index + 1).padStart(2, "0")}
+              </span>
+
+            </div>
 
 
-              <div
-                class="date"
-                style="
-                  font-family:'${escapeHTML(fontFamily)}', serif;
-                  color:${escapeHTML(textColor)};
-                "
-              >
-                ${escapeHTML(
-                  writing.date || ""
-                )}
-              </div>
+            <div
+              class="date"
+              style="
+                font-family:'${escapeHTML(fontFamily)}', serif;
+                color:${escapeHTML(textColor)};
+              "
+            >
+
+              ${escapeHTML(
+                writing.date || ""
+              )}
+
+            </div>
 
 
-              <h2
-                style="
-                  font-family:'${escapeHTML(fontFamily)}', serif;
-                  color:${escapeHTML(textColor)};
-                "
-              >
-                ${escapeHTML(
-                  writing.title ||
-                  "Untitled"
-                )}
-              </h2>
+            <h2
+              style="
+                font-family:'${escapeHTML(fontFamily)}', serif;
+                color:${escapeHTML(textColor)};
+              "
+            >
+
+              ${escapeHTML(
+                writing.title || "Untitled"
+              )}
+
+            </h2>
 
 
-              ${
-                writing.tags &&
-                writing.tags.length
-                  ?
-                  `
-                    <div class="writing-tags">
+            ${
+              writing.tags &&
+              writing.tags.length
 
-                      ${writing.tags
-                        .map(
-                          tag =>
-                            `<span>
-                              #${escapeHTML(tag)}
-                            </span>`
-                        )
-                        .join("")}
+              ?
 
-                    </div>
-                  `
-                  :
-                  ""
-              }
+              `
+                <div class="writing-tags">
 
+                  ${writing.tags
+                    .map(
+                      tag =>
+                        `<span>#${escapeHTML(tag)}</span>`
+                    )
+                    .join("")}
 
-              <article
-                class="text dynamic-content"
-                style="
-                  font-family:'${escapeHTML(fontFamily)}', serif;
-                  color:${escapeHTML(textColor)};
-                "
-              >
-                ${writing.content || ""}
-              </article>
+                </div>
+              `
+
+              :
+
+              ""
+            }
 
 
-              <div class="page-number">
-                ${String(
-                  index + 2
-                ).padStart(2, "0")}
-              </div>
-            `;
+            <article
+              class="text dynamic-content"
+              style="
+                font-family:'${escapeHTML(fontFamily)}', serif;
+                color:${escapeHTML(textColor)};
+              "
+            >
+
+              ${writing.content || ""}
+
+            </article>
+
+
+            <div class="page-number">
+
+              ${String(index + 2).padStart(2, "0")}
+
+            </div>
+
+          `;
 
 
           writingsContainer.appendChild(
@@ -497,14 +549,175 @@
     }
 
 
-    /* =========================
-       PAGES
-    ========================= */
+    /* =========================================================
+       ARCHIVE
+    ========================================================= */
+
+    function renderArchive(
+      query = ""
+    ) {
+
+      const list =
+        document.getElementById(
+          "archiveList"
+        );
+
+
+      const search =
+        query
+          .trim()
+          .toLowerCase();
+
+
+      const filtered =
+        publishedPages.filter(
+          page => {
+
+            const title =
+              (
+                page.title || ""
+              ).toLowerCase();
+
+
+            const content =
+              (
+                page.content || ""
+              ).toLowerCase();
+
+
+            const date =
+              (
+                page.date || ""
+              ).toLowerCase();
+
+
+            const tags =
+              (
+                page.tags || []
+              )
+              .join(" ")
+              .toLowerCase();
+
+
+            return (
+
+              title.includes(search) ||
+
+              content.includes(search) ||
+
+              date.includes(search) ||
+
+              tags.includes(search)
+
+            );
+
+          }
+        );
+
+
+      if (!filtered.length) {
+
+        list.innerHTML = `
+          <div class="empty-archive">
+            مفيش كتابات هنا لسه.
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      list.innerHTML = "";
+
+
+      filtered.forEach(page => {
+
+        const originalIndex =
+          publishedPages.findIndex(
+            item =>
+              item.id === page.id
+          );
+
+
+        const item =
+          document.createElement(
+            "button"
+          );
+
+
+        item.className =
+          "archive-item";
+
+
+        item.innerHTML = `
+
+          <span class="archive-number">
+
+            ${String(
+              originalIndex + 1
+            ).padStart(2, "0")}
+
+          </span>
+
+
+          <span class="archive-title">
+
+            ${escapeHTML(
+              page.title ||
+              "Untitled"
+            )}
+
+          </span>
+
+
+          <span class="archive-date">
+
+            ${escapeHTML(
+              page.date || ""
+            )}
+
+          </span>
+
+        `;
+
+
+        item.addEventListener(
+          "click",
+          () => {
+
+            showPage(
+              originalIndex + 2
+            );
+
+          }
+        );
+
+
+        list.appendChild(item);
+
+      });
+
+    }
+
+
+    searchInput.addEventListener(
+      "input",
+      () => {
+
+        renderArchive(
+          searchInput.value
+        );
+
+      }
+    );
+
+
+    /* =========================================================
+       NAVIGATION
+    ========================================================= */
 
     function rebuildPages() {
-
-      renderWritings();
-
 
       pages =
         document.querySelectorAll(
@@ -517,10 +730,6 @@
     }
 
 
-    /* =========================
-       SHOW PAGE
-    ========================= */
-
     function showPage(index) {
 
       if (!pages.length) return;
@@ -531,9 +740,7 @@
       }
 
 
-      if (
-        index >= pages.length
-      ) {
+      if (index >= pages.length) {
 
         index =
           pages.length - 1;
@@ -566,8 +773,7 @@
 
 
       nextButton.disabled =
-        currentPage ===
-        pages.length - 1;
+        currentPage === pages.length - 1;
 
 
       window.scrollTo({
@@ -578,10 +784,6 @@
     }
 
 
-    /* =========================
-       NAVIGATION
-    ========================= */
-
     function updateNavigation() {
 
       pages =
@@ -590,14 +792,11 @@
         );
 
 
-      if (
-        !pages.length
-      ) return;
+      if (!pages.length) return;
 
 
       if (
-        currentPage >=
-        pages.length
+        currentPage >= pages.length
       ) {
 
         currentPage =
@@ -636,9 +835,7 @@
       "click",
       () => {
 
-        if (
-          currentPage > 0
-        ) {
+        if (currentPage > 0) {
 
           showPage(
             currentPage - 1
@@ -650,173 +847,9 @@
     );
 
 
-    /* =========================
-       ARCHIVE
-    ========================= */
-
-    function renderArchive(
-      query = ""
-    ) {
-
-      const list =
-        document.getElementById(
-          "archiveList"
-        );
-
-
-      const writings =
-        getPublishedPages();
-
-
-      const search =
-        query
-          .trim()
-          .toLowerCase();
-
-
-      const filtered =
-        writings.filter(
-          page => {
-
-            const title =
-              (
-                page.title || ""
-              )
-                .toLowerCase();
-
-
-            const content =
-              (
-                page.content || ""
-              )
-                .toLowerCase();
-
-
-            const date =
-              (
-                page.date || ""
-              )
-                .toLowerCase();
-
-
-            const tags =
-              (
-                page.tags || []
-              )
-                .join(" ")
-                .toLowerCase();
-
-
-            return (
-              title.includes(search) ||
-              content.includes(search) ||
-              date.includes(search) ||
-              tags.includes(search)
-            );
-
-          }
-        );
-
-
-      if (!filtered.length) {
-
-        list.innerHTML =
-          `
-            <div class="empty-archive">
-              مفيش كتابات هنا لسه.
-            </div>
-          `;
-
-        return;
-
-      }
-
-
-      list.innerHTML =
-        "";
-
-
-      filtered.forEach(
-        page => {
-
-          const originalIndex =
-            writings.findIndex(
-              item =>
-                item.id ===
-                page.id
-            );
-
-
-          const item =
-            document.createElement(
-              "button"
-            );
-
-
-          item.className =
-            "archive-item";
-
-
-          item.innerHTML =
-            `
-              <span class="archive-number">
-                ${String(
-                  originalIndex + 1
-                ).padStart(2, "0")}
-              </span>
-
-              <span class="archive-title">
-                ${escapeHTML(
-                  page.title ||
-                  "Untitled"
-                )}
-              </span>
-
-              <span class="archive-date">
-                ${escapeHTML(
-                  page.date || ""
-                )}
-              </span>
-            `;
-
-
-          item.addEventListener(
-            "click",
-            () => {
-
-              showPage(
-                originalIndex + 2
-              );
-
-            }
-          );
-
-
-          list.appendChild(
-            item
-          );
-
-        }
-      );
-
-    }
-
-
-    searchInput.addEventListener(
-      "input",
-      () => {
-
-        renderArchive(
-          searchInput.value
-        );
-
-      }
-    );
-
-
-    /* =========================
+    /* =========================================================
        KEYBOARD
-    ========================= */
+    ========================================================= */
 
     document.addEventListener(
       "keydown",
@@ -826,7 +859,9 @@
           event.target.tagName ===
           "INPUT"
         ) {
+
           return;
+
         }
 
 
@@ -854,9 +889,7 @@
           "ArrowLeft"
         ) {
 
-          if (
-            currentPage > 0
-          ) {
+          if (currentPage > 0) {
 
             showPage(
               currentPage - 1
@@ -870,13 +903,11 @@
     );
 
 
-    /* =========================
+    /* =========================================================
        START
-    ========================= */
+    ========================================================= */
 
-    renderArchive();
-
-    rebuildPages();
+    loadPublishedPages();
 
   </script>
 
