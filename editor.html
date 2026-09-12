@@ -1,30 +1,24 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Thoughts — Editor</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link
     href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700&family=Tajawal:wght@400;500;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Caveat:wght@400;500;600&family=Playfair+Display:wght@400;500;600&display=swap"
     rel="stylesheet"
   >
 
-  <style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <style>
     * {
       box-sizing: border-box;
       margin: 0;
@@ -39,9 +33,71 @@
       padding: 30px;
     }
 
-    /* =========================
-       TOP BAR
-    ========================= */
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+    }
+
+    .login-screen {
+      min-height: 90vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-box {
+      width: min(420px, 100%);
+      background: #fdfbf7;
+      padding: 45px 35px;
+      box-shadow: 0 8px 30px rgba(50, 40, 30, .12);
+      text-align: center;
+    }
+
+    .login-logo {
+      font-family: "Caveat", cursive;
+      font-size: 42px;
+      margin-bottom: 8px;
+    }
+
+    .login-subtitle {
+      color: #9b8e82;
+      margin-bottom: 30px;
+      font-family: "Cairo", sans-serif;
+      font-size: 13px;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #d4cbc1;
+      background: white;
+      outline: none;
+      font-family: "Cairo", sans-serif;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #302b27;
+      color: white;
+      margin-top: 5px;
+    }
+
+    .login-error {
+      color: #a36f65;
+      font-family: "Cairo", sans-serif;
+      font-size: 13px;
+      margin-top: 15px;
+      min-height: 20px;
+    }
+
+    .app {
+      display: none;
+    }
 
     .topbar {
       width: min(1100px, 100%);
@@ -70,14 +126,9 @@
       flex-wrap: wrap;
     }
 
-    button {
-      font-family: inherit;
-      cursor: pointer;
-      border: none;
-    }
-
     .new-page,
-    .preview-btn {
+    .preview-btn,
+    .logout-btn {
       padding: 9px 17px;
       border-radius: 4px;
     }
@@ -87,15 +138,12 @@
       color: white;
     }
 
-    .preview-btn {
+    .preview-btn,
+    .logout-btn {
       background: transparent;
       color: #302b27;
       border: 1px solid #cfc6ba;
     }
-
-    /* =========================
-       TOOLBAR
-    ========================= */
 
     .toolbar,
     .appearance {
@@ -125,10 +173,6 @@
 
     .tool:hover {
       background: #e4ddd2;
-    }
-
-    .tool.active {
-      background: #d9cfc2;
     }
 
     .separator {
@@ -184,10 +228,6 @@
       text-decoration: underline;
     }
 
-    /* =========================
-       STATUS
-    ========================= */
-
     .meta-bar {
       width: min(900px, 100%);
       margin: 15px auto;
@@ -216,10 +256,6 @@
       font-family: inherit;
     }
 
-    /* =========================
-       PAPER
-    ========================= */
-
     .paper-wrapper {
       width: min(900px, 100%);
       margin: auto;
@@ -234,15 +270,7 @@
         0 8px 30px rgba(50, 40, 30, .12),
         0 1px 3px rgba(0, 0, 0, .05);
       position: relative;
-      transition:
-        background .3s,
-        color .3s,
-        box-shadow .3s;
     }
-
-    /* =========================
-       DATE
-    ========================= */
 
     .date {
       text-align: center;
@@ -260,10 +288,6 @@
       opacity: .45;
     }
 
-    /* =========================
-       TITLE
-    ========================= */
-
     .title {
       text-align: center;
       font-size: 36px;
@@ -278,10 +302,6 @@
       content: "عنوان الكتابة";
       color: #c5bdb4;
     }
-
-    /* =========================
-       CONTENT
-    ========================= */
 
     .content {
       min-height: 600px;
@@ -302,10 +322,6 @@
       margin: 30px auto;
     }
 
-    /* =========================
-       PAGE NUMBER
-    ========================= */
-
     .page-number {
       position: absolute;
       bottom: 35px;
@@ -315,10 +331,6 @@
       color: #aaa097;
       font-size: 17px;
     }
-
-    /* =========================
-       ACTIONS
-    ========================= */
 
     .actions {
       width: min(900px, 100%);
@@ -349,10 +361,6 @@
     .saved-message.show {
       opacity: 1;
     }
-
-    /* =========================
-       PAGES
-    ========================= */
 
     .pages {
       width: min(900px, 100%);
@@ -386,11 +394,6 @@
       gap: 15px;
       margin-bottom: 7px;
       cursor: pointer;
-      transition: .2s;
-    }
-
-    .page-item:hover {
-      background: rgba(255, 255, 255, .8);
     }
 
     .page-info {
@@ -402,7 +405,6 @@
     .page-index {
       font-family: "Caveat", cursive;
       color: #a49486;
-      direction: ltr;
     }
 
     .page-date {
@@ -430,10 +432,6 @@
       color: #a79c92;
     }
 
-    /* =========================
-       BACKUP
-    ========================= */
-
     .backup {
       width: min(900px, 100%);
       margin: 35px auto;
@@ -452,10 +450,6 @@
       color: #756b62;
     }
 
-    /* =========================
-       PREVIEW
-    ========================= */
-
     body.preview-mode {
       padding: 0;
     }
@@ -468,11 +462,6 @@
     body.preview-mode .pages,
     body.preview-mode .backup {
       display: none;
-    }
-
-    body.preview-mode .paper-wrapper {
-      width: min(900px, 100%);
-      margin: auto;
     }
 
     body.preview-mode .paper {
@@ -496,12 +485,7 @@
       border-radius: 4px;
     }
 
-    /* =========================
-       MOBILE
-    ========================= */
-
     @media (max-width: 700px) {
-
       body {
         padding: 15px;
       }
@@ -536,433 +520,366 @@
       .page-info {
         flex-wrap: wrap;
       }
-
-      .actions {
-        gap: 15px;
-      }
     }
-
   </style>
 </head>
 
 <body>
 
-  <!-- TOP -->
+  <!-- LOGIN -->
 
-  <header class="topbar">
+  <div id="loginScreen" class="login-screen">
 
-    <div>
-      <div class="logo">
+    <div class="login-box">
+
+      <div class="login-logo">
         Thoughts
       </div>
 
-      <div class="editor-label">
-        EDITOR
+      <div class="login-subtitle">
+        Private Editor
       </div>
-    </div>
-
-    <div class="top-actions">
-
-      <button
-        class="preview-btn"
-        onclick="togglePreview()"
-      >
-        Preview
-      </button>
-
-      <button
-        class="new-page"
-        onclick="newPage()"
-      >
-        + New Page
-      </button>
-
-    </div>
-
-  </header>
-
-
-  <!-- TOOLBAR -->
-
-  <div class="toolbar">
-
-    <button
-      class="tool"
-      onclick="format('bold')"
-      title="Bold"
-    >
-      <b>B</b>
-    </button>
-
-    <button
-      class="tool"
-      onclick="format('italic')"
-      title="Italic"
-    >
-      <i>I</i>
-    </button>
-
-    <button
-      class="tool"
-      onclick="format('underline')"
-      title="Underline"
-    >
-      <u>U</u>
-    </button>
-
-    <span class="separator"></span>
-
-    <select
-      onchange="changeFontSize(this.value)"
-    >
-      <option value="3">
-        حجم عادي
-      </option>
-
-      <option value="4">
-        كبير
-      </option>
-
-      <option value="5">
-        أكبر
-      </option>
-
-      <option value="6">
-        كبير جدًا
-      </option>
-    </select>
-
-    <span class="separator"></span>
-
-    <button
-      class="tool"
-      onclick="format('justifyRight')"
-    >
-      ☰
-    </button>
-
-    <button
-      class="tool"
-      onclick="format('justifyCenter')"
-    >
-      ≡
-    </button>
-
-    <button
-      class="tool"
-      onclick="format('justifyLeft')"
-    >
-      ☰
-    </button>
-
-    <span class="separator"></span>
-
-    <button
-      class="tool"
-      onclick="insertImage()"
-    >
-      🖼
-    </button>
-
-  </div>
-
-
-  <!-- APPEARANCE -->
-
-  <div class="appearance">
-
-    <div class="appearance-group">
-
-      <label>
-        الخط
-      </label>
-
-      <select
-        id="fontFamily"
-        class="style-select"
-        onchange="changeFontFamily(this.value)"
-      >
-        <option value="Amiri">
-          Amiri
-        </option>
-
-        <option value="Cairo">
-          Cairo
-        </option>
-
-        <option value="Tajawal">
-          Tajawal
-        </option>
-
-        <option value="Noto Naskh Arabic">
-          Noto Naskh Arabic
-        </option>
-
-        <option value="Caveat">
-          Caveat
-        </option>
-
-        <option value="Georgia">
-          Georgia
-        </option>
-      </select>
-
-    </div>
-
-
-    <div class="appearance-group">
-
-      <label>
-        لون الكتابة
-      </label>
 
       <input
-        id="textColor"
-        class="color-picker"
-        type="color"
-        value="#302b27"
-        onchange="changeTextColor(this.value)"
+        id="loginEmail"
+        type="email"
+        placeholder="Email"
+        autocomplete="email"
       >
-
-    </div>
-
-
-    <div class="appearance-group">
-
-      <label>
-        لون الورقة
-      </label>
 
       <input
-        id="paperColor"
-        class="color-picker"
-        type="color"
-        value="#fdfbf7"
-        onchange="changePaperColor(this.value)"
+        id="loginPassword"
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password"
       >
+
+      <button
+        class="login-btn"
+        onclick="login()"
+      >
+        Enter Editor
+      </button>
+
+      <div
+        id="loginError"
+        class="login-error"
+      ></div>
 
     </div>
 
+  </div>
 
-    <div class="appearance-group">
 
-      <label>
-        شكل الصفحة
-      </label>
+  <!-- APP -->
 
-      <select
-        id="pageStyle"
-        class="style-select"
-        onchange="changePageStyle(this.value)"
-      >
-        <option value="soft">
-          Soft
-        </option>
+  <div id="app" class="app">
 
-        <option value="clean">
-          Clean
-        </option>
+    <header class="topbar">
 
-        <option value="shadow">
-          Shadow
-        </option>
+      <div>
+        <div class="logo">
+          Thoughts
+        </div>
 
-        <option value="dark">
-          Dark
-        </option>
+        <div class="editor-label">
+          EDITOR
+        </div>
+      </div>
+
+      <div class="top-actions">
+
+        <button
+          class="preview-btn"
+          onclick="togglePreview()"
+        >
+          Preview
+        </button>
+
+        <button
+          class="new-page"
+          onclick="newPage()"
+        >
+          + New Page
+        </button>
+
+        <button
+          class="logout-btn"
+          onclick="logout()"
+        >
+          Logout
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <div class="toolbar">
+
+      <button class="tool" onclick="format('bold')">
+        <b>B</b>
+      </button>
+
+      <button class="tool" onclick="format('italic')">
+        <i>I</i>
+      </button>
+
+      <button class="tool" onclick="format('underline')">
+        <u>U</u>
+      </button>
+
+      <span class="separator"></span>
+
+      <select onchange="changeFontSize(this.value)">
+        <option value="3">حجم عادي</option>
+        <option value="4">كبير</option>
+        <option value="5">أكبر</option>
+        <option value="6">كبير جدًا</option>
       </select>
 
+      <span class="separator"></span>
+
+      <button class="tool" onclick="format('justifyRight')">☰</button>
+      <button class="tool" onclick="format('justifyCenter')">≡</button>
+      <button class="tool" onclick="format('justifyLeft')">☰</button>
+
+      <span class="separator"></span>
+
+      <button class="tool" onclick="insertImage()">🖼</button>
+
     </div>
+
+
+    <div class="appearance">
+
+      <div class="appearance-group">
+        <label>الخط</label>
+
+        <select
+          id="fontFamily"
+          class="style-select"
+          onchange="changeFontFamily(this.value)"
+        >
+          <option value="Amiri">Amiri</option>
+          <option value="Cairo">Cairo</option>
+          <option value="Tajawal">Tajawal</option>
+          <option value="Noto Naskh Arabic">Noto Naskh Arabic</option>
+          <option value="Caveat">Caveat</option>
+          <option value="Georgia">Georgia</option>
+        </select>
+      </div>
+
+      <div class="appearance-group">
+        <label>لون الكتابة</label>
+
+        <input
+          id="textColor"
+          class="color-picker"
+          type="color"
+          value="#302b27"
+          onchange="changeTextColor(this.value)"
+        >
+      </div>
+
+      <div class="appearance-group">
+        <label>لون الورقة</label>
+
+        <input
+          id="paperColor"
+          class="color-picker"
+          type="color"
+          value="#fdfbf7"
+          onchange="changePaperColor(this.value)"
+        >
+      </div>
+
+      <div class="appearance-group">
+        <label>شكل الصفحة</label>
+
+        <select
+          id="pageStyle"
+          class="style-select"
+          onchange="changePageStyle(this.value)"
+        >
+          <option value="soft">Soft</option>
+          <option value="clean">Clean</option>
+          <option value="shadow">Shadow</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+
+      <button
+        class="reset-style"
+        onclick="resetStyle()"
+      >
+        Reset
+      </button>
+
+    </div>
+
+
+    <div class="meta-bar">
+
+      <select
+        id="status"
+        class="status-select"
+      >
+        <option value="draft">Draft</option>
+        <option value="published">Published</option>
+      </select>
+
+      <input
+        id="tags"
+        class="tags-input"
+        type="text"
+        placeholder="Tags — مثال: thoughts, life, overthinking"
+      >
+
+    </div>
+
+
+    <main class="paper-wrapper">
+
+      <section
+        class="paper"
+        id="paper"
+      >
+
+        <div
+          id="date"
+          class="date"
+          contenteditable="true"
+          spellcheck="false"
+        ></div>
+
+        <h1
+          id="title"
+          class="title"
+          contenteditable="true"
+        ></h1>
+
+        <div
+          id="content"
+          class="content"
+          contenteditable="true"
+        ></div>
+
+        <div
+          id="pageNumber"
+          class="page-number"
+        >
+          01
+        </div>
+
+      </section>
+
+    </main>
 
 
     <button
-      class="reset-style"
-      onclick="resetStyle()"
+      class="exit-preview"
+      onclick="togglePreview()"
     >
-      Reset
+      Exit Preview
     </button>
 
-  </div>
 
+    <div class="actions">
 
-  <!-- META -->
-
-  <div class="meta-bar">
-
-    <select
-      id="status"
-      class="status-select"
-    >
-      <option value="draft">
-        Draft
-      </option>
-
-      <option value="published">
-        Published
-      </option>
-    </select>
-
-
-    <input
-      id="tags"
-      class="tags-input"
-      type="text"
-      placeholder="Tags — مثال: thoughts, life, overthinking"
-    >
-
-  </div>
-
-
-  <!-- PAPER -->
-
-  <main class="paper-wrapper">
-
-    <section
-      class="paper"
-      id="paper"
-    >
-
-      <div
-        id="date"
-        class="date"
-        contenteditable="true"
-        spellcheck="false"
-      ></div>
-
-
-      <h1
-        id="title"
-        class="title"
-        contenteditable="true"
-        spellcheck="true"
-      ></h1>
-
-
-      <div
-        id="content"
-        class="content"
-        contenteditable="true"
-        spellcheck="true"
-      ></div>
-
-
-      <div
-        id="pageNumber"
-        class="page-number"
+      <button
+        class="delete"
+        onclick="deleteCurrentPage()"
       >
-        01
-      </div>
+        Delete page
+      </button>
+
+      <span
+        id="savedMessage"
+        class="saved-message"
+      >
+        Saved ✓
+      </span>
+
+      <button
+        class="save"
+        onclick="savePage()"
+      >
+        Save
+      </button>
+
+    </div>
+
+
+    <section class="pages">
+
+      <h2 class="pages-title">
+        Your pages
+      </h2>
+
+      <input
+        id="pageSearch"
+        class="page-search"
+        type="search"
+        placeholder="Search your pages..."
+        oninput="displayPages(this.value)"
+      >
+
+      <div id="pagesList"></div>
 
     </section>
 
-  </main>
 
+    <section class="backup">
 
-  <!-- EXIT PREVIEW -->
+      <button onclick="exportBackup()">
+        Export Backup
+      </button>
 
-  <button
-    class="exit-preview"
-    onclick="togglePreview()"
-  >
-    Exit Preview
-  </button>
+      <button onclick="document.getElementById('restoreInput').click()">
+        Restore Backup
+      </button>
 
+      <input
+        id="restoreInput"
+        type="file"
+        accept=".json"
+        style="display:none"
+        onchange="restoreBackup(event)"
+      >
 
-  <!-- ACTIONS -->
-
-  <div class="actions">
-
-    <button
-      class="delete"
-      onclick="deleteCurrentPage()"
-    >
-      Delete page
-    </button>
-
-
-    <span
-      id="savedMessage"
-      class="saved-message"
-    >
-      Saved ✓
-    </span>
-
-
-    <button
-      class="save"
-      onclick="savePage()"
-    >
-      Save
-    </button>
+    </section>
 
   </div>
-
-
-  <!-- SAVED PAGES -->
-
-  <section class="pages">
-
-    <h2 class="pages-title">
-      Your pages
-    </h2>
-
-
-    <input
-      id="pageSearch"
-      class="page-search"
-      type="search"
-      placeholder="Search your pages..."
-      oninput="displayPages(this.value)"
-    >
-
-
-    <div id="pagesList"></div>
-
-  </section>
-
-
-  <!-- BACKUP -->
-
-  <section class="backup">
-
-    <button onclick="exportBackup()">
-      Export Backup
-    </button>
-
-    <button
-      onclick="document.getElementById('restoreInput').click()"
-    >
-      Restore Backup
-    </button>
-
-    <input
-      id="restoreInput"
-      type="file"
-      accept=".json"
-      style="display:none"
-      onchange="restoreBackup(event)"
-    >
-
-  </section>
 
 
   <script>
 
     /* =========================
-       DATA
+       SUPABASE
     ========================= */
 
-    let pages =
-      JSON.parse(
-        localStorage.getItem("thoughtsPages")
-      ) || [];
+    const SUPABASE_URL =
+      "https://fytuxwmmbguombjidbvb.supabase.co";
 
-    let currentPageId = null;
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_mw6HCU-bobHuYZZ5AMd9HQ_cOzXLeXY";
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
 
 
     /* =========================
-       DEFAULT STYLE
+       DATA
     ========================= */
+
+    let pages = [];
+    let currentPageId = null;
+    let currentUser = null;
+
 
     const defaultStyle = {
       paperColor: "#fdfbf7",
@@ -971,10 +888,6 @@
       pageStyle: "soft"
     };
 
-
-    /* =========================
-       ELEMENTS
-    ========================= */
 
     const date =
       document.getElementById("date");
@@ -996,6 +909,231 @@
 
 
     /* =========================
+       AUTH
+    ========================= */
+
+    async function checkAuth() {
+
+      const {
+        data: {
+          session
+        }
+      } =
+        await supabaseClient.auth.getSession();
+
+      if (session) {
+
+        currentUser =
+          session.user;
+
+        showEditor();
+
+      }
+
+      else {
+
+        showLogin();
+
+      }
+
+    }
+
+
+    function showLogin() {
+
+      document.getElementById(
+        "loginScreen"
+      ).style.display = "flex";
+
+      document.getElementById(
+        "app"
+      ).style.display = "none";
+
+    }
+
+
+    async function showEditor() {
+
+      document.getElementById(
+        "loginScreen"
+      ).style.display = "none";
+
+      document.getElementById(
+        "app"
+      ).style.display = "block";
+
+      await loadPages();
+
+    }
+
+
+    async function login() {
+
+      const email =
+        document.getElementById(
+          "loginEmail"
+        ).value.trim();
+
+      const password =
+        document.getElementById(
+          "loginPassword"
+        ).value;
+
+      const errorBox =
+        document.getElementById(
+          "loginError"
+        );
+
+      errorBox.textContent = "";
+
+      if (!email || !password) {
+
+        errorBox.textContent =
+          "اكتبي الإيميل والباسورد.";
+
+        return;
+
+      }
+
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+
+      if (error) {
+
+        errorBox.textContent =
+          "الإيميل أو الباسورد غير صحيح.";
+
+        console.error(error);
+
+        return;
+
+      }
+
+
+      currentUser =
+        data.user;
+
+      await showEditor();
+
+    }
+
+
+    async function logout() {
+
+      await supabaseClient.auth.signOut();
+
+      currentUser = null;
+      pages = [];
+      currentPageId = null;
+
+      showLogin();
+
+    }
+
+
+    supabaseClient.auth.onAuthStateChange(
+      async (event, session) => {
+
+        if (event === "SIGNED_OUT") {
+
+          currentUser = null;
+
+          showLogin();
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       LOAD PAGES
+    ========================= */
+
+    async function loadPages() {
+
+      if (!currentUser) return;
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("thoughts")
+          .select("*")
+          .eq(
+            "owner_id",
+            currentUser.id
+          )
+          .order(
+            "created_at",
+            {
+              ascending: true
+            }
+          );
+
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          "حصلت مشكلة في تحميل الكتابات."
+        );
+
+        return;
+
+      }
+
+
+      pages =
+        (data || []).map(page => ({
+
+          id: page.id,
+
+          date:
+            page.date || "",
+
+          title:
+            page.title || "",
+
+          content:
+            page.content || "",
+
+          status:
+            page.status || "draft",
+
+          tags:
+            page.tags || [],
+
+          style:
+            page.style || defaultStyle,
+
+          createdAt:
+            page.created_at,
+
+          updatedAt:
+            page.updated_at
+
+        }));
+
+
+      displayPages();
+
+      newPage();
+
+    }
+
+
+    /* =========================
        FORMAT
     ========================= */
 
@@ -1011,10 +1149,6 @@
 
     }
 
-
-    /* =========================
-       FONT SIZE
-    ========================= */
 
     function changeFontSize(size) {
 
@@ -1075,7 +1209,7 @@
 
 
     /* =========================
-       FONT
+       STYLE
     ========================= */
 
     function changeFontFamily(font) {
@@ -1095,27 +1229,14 @@
     }
 
 
-    /* =========================
-       TEXT COLOR
-    ========================= */
-
     function changeTextColor(color) {
 
-      paper.style.color =
-        color;
-
-      content.style.color =
-        color;
-
-      title.style.color =
-        color;
+      paper.style.color = color;
+      content.style.color = color;
+      title.style.color = color;
 
     }
 
-
-    /* =========================
-       PAPER COLOR
-    ========================= */
 
     function changePaperColor(color) {
 
@@ -1124,10 +1245,6 @@
 
     }
 
-
-    /* =========================
-       PAGE STYLE
-    ========================= */
 
     function changePageStyle(style) {
 
@@ -1173,10 +1290,6 @@
 
     }
 
-
-    /* =========================
-       RESET
-    ========================= */
 
     function resetStyle() {
 
@@ -1226,10 +1339,6 @@
     }
 
 
-    /* =========================
-       GET STYLE
-    ========================= */
-
     function getCurrentStyle() {
 
       return {
@@ -1258,236 +1367,6 @@
 
     }
 
-
-    /* =========================
-       NEW PAGE
-    ========================= */
-
-    function newPage() {
-
-      currentPageId = null;
-
-      date.innerHTML = "";
-      title.innerHTML = "";
-      content.innerHTML = "";
-
-      status.value =
-        "draft";
-
-      tags.value =
-        "";
-
-      document.getElementById(
-        "pageNumber"
-      ).textContent =
-        String(
-          pages.length + 1
-        ).padStart(2, "0");
-
-      resetStyle();
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-
-    }
-
-
-    /* =========================
-       SAVE
-    ========================= */
-
-    function savePage() {
-
-      const dateValue =
-        date.innerHTML.trim();
-
-      const titleValue =
-        title.innerHTML.trim();
-
-      const contentValue =
-        content.innerHTML.trim();
-
-      if (
-        !titleValue &&
-        !contentValue
-      ) {
-
-        alert(
-          "اكتبي حاجة الأول ❤️"
-        );
-
-        return;
-
-      }
-
-
-      const tagList =
-        tags.value
-          .split(",")
-          .map(tag => tag.trim())
-          .filter(Boolean);
-
-
-      const pageData = {
-
-        date: dateValue,
-
-        title: titleValue,
-
-        content: contentValue,
-
-        status:
-          status.value,
-
-        tags:
-          tagList,
-
-        style:
-          getCurrentStyle(),
-
-        updatedAt:
-          new Date().toISOString()
-
-      };
-
-
-      if (currentPageId === null) {
-
-        const newPageObject = {
-
-          id:
-            Date.now(),
-
-          ...pageData,
-
-          createdAt:
-            new Date().toISOString()
-
-        };
-
-        pages.push(
-          newPageObject
-        );
-
-        currentPageId =
-          newPageObject.id;
-
-      }
-
-      else {
-
-        const page =
-          pages.find(
-            p =>
-              p.id ===
-              currentPageId
-          );
-
-        if (page) {
-
-          Object.assign(
-            page,
-            pageData
-          );
-
-        }
-
-      }
-
-
-      localStorage.setItem(
-        "thoughtsPages",
-        JSON.stringify(pages)
-      );
-
-
-      updatePageNumber();
-
-      showSavedMessage();
-
-      displayPages();
-
-    }
-
-
-    /* =========================
-       UPDATE PAGE NUMBER
-    ========================= */
-
-    function updatePageNumber() {
-
-      const index =
-        pages.findIndex(
-          page =>
-            page.id ===
-            currentPageId
-        );
-
-      document.getElementById(
-        "pageNumber"
-      ).textContent =
-        String(
-          index >= 0
-            ? index + 1
-            : pages.length + 1
-        ).padStart(2, "0");
-
-    }
-
-
-    /* =========================
-       LOAD
-    ========================= */
-
-    function loadPage(id) {
-
-      const page =
-        pages.find(
-          p =>
-            p.id === id
-        );
-
-      if (!page) return;
-
-      currentPageId =
-        page.id;
-
-      date.innerHTML =
-        page.date || "";
-
-      title.innerHTML =
-        page.title || "";
-
-      content.innerHTML =
-        page.content || "";
-
-      status.value =
-        page.status || "draft";
-
-      tags.value =
-        (page.tags || [])
-          .join(", ");
-
-      applyStyle(
-        page.style ||
-        defaultStyle
-      );
-
-      updatePageNumber();
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-
-    }
-
-
-    /* =========================
-       APPLY STYLE
-    ========================= */
 
     function applyStyle(style) {
 
@@ -1546,27 +1425,21 @@
         style.pageStyle;
 
 
-      if (
-        style.pageStyle === "clean"
-      ) {
+      if (style.pageStyle === "clean") {
 
         paper.style.boxShadow =
           "none";
 
       }
 
-      else if (
-        style.pageStyle === "shadow"
-      ) {
+      else if (style.pageStyle === "shadow") {
 
         paper.style.boxShadow =
           "0 18px 45px rgba(40,30,20,.20)";
 
       }
 
-      else if (
-        style.pageStyle === "dark"
-      ) {
+      else if (style.pageStyle === "dark") {
 
         paper.style.backgroundColor =
           "#292522";
@@ -1596,14 +1469,331 @@
 
 
     /* =========================
+       NEW PAGE
+    ========================= */
+
+    function newPage() {
+
+      currentPageId = null;
+
+      date.innerHTML = "";
+      title.innerHTML = "";
+      content.innerHTML = "";
+
+      status.value = "draft";
+      tags.value = "";
+
+      document.getElementById(
+        "pageNumber"
+      ).textContent =
+        String(
+          pages.length + 1
+        ).padStart(2, "0");
+
+      resetStyle();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+
+
+    /* =========================
+       SAVE
+    ========================= */
+
+    async function savePage() {
+
+      if (!currentUser) {
+
+        alert("لازم تسجلي الدخول الأول.");
+
+        return;
+
+      }
+
+
+      const dateValue =
+        date.innerHTML.trim();
+
+      const titleValue =
+        title.innerHTML.trim();
+
+      const contentValue =
+        content.innerHTML.trim();
+
+
+      if (!titleValue && !contentValue) {
+
+        alert("اكتبي حاجة الأول ❤️");
+
+        return;
+
+      }
+
+
+      const tagList =
+        tags.value
+          .split(",")
+          .map(tag => tag.trim())
+          .filter(Boolean);
+
+
+      const pageData = {
+
+        date: dateValue,
+
+        title: titleValue,
+
+        content: contentValue,
+
+        status: status.value,
+
+        tags: tagList,
+
+        style: getCurrentStyle(),
+
+        updated_at:
+          new Date().toISOString()
+
+      };
+
+
+      if (currentPageId === null) {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .from("thoughts")
+            .insert({
+
+              owner_id:
+                currentUser.id,
+
+              date:
+                pageData.date,
+
+              title:
+                pageData.title,
+
+              content:
+                pageData.content,
+
+              status:
+                pageData.status,
+
+              tags:
+                pageData.tags,
+
+              style:
+                pageData.style
+
+            })
+            .select()
+            .single();
+
+
+        if (error) {
+
+          console.error(error);
+
+          alert(
+            "حصلت مشكلة أثناء الحفظ."
+          );
+
+          return;
+
+        }
+
+
+        currentPageId =
+          data.id;
+
+
+        pages.push({
+
+          id: data.id,
+
+          date: data.date,
+
+          title: data.title,
+
+          content: data.content,
+
+          status: data.status,
+
+          tags: data.tags || [],
+
+          style: data.style || defaultStyle,
+
+          createdAt: data.created_at,
+
+          updatedAt: data.updated_at
+
+        });
+
+      }
+
+
+      else {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .from("thoughts")
+            .update(pageData)
+            .eq(
+              "id",
+              currentPageId
+            )
+            .eq(
+              "owner_id",
+              currentUser.id
+            )
+            .select()
+            .single();
+
+
+        if (error) {
+
+          console.error(error);
+
+          alert(
+            "حصلت مشكلة أثناء تحديث الصفحة."
+          );
+
+          return;
+
+        }
+
+
+        const index =
+          pages.findIndex(
+            p =>
+              p.id === currentPageId
+          );
+
+
+        if (index !== -1) {
+
+          pages[index] = {
+
+            id: data.id,
+
+            date: data.date,
+
+            title: data.title,
+
+            content: data.content,
+
+            status: data.status,
+
+            tags: data.tags || [],
+
+            style:
+              data.style || defaultStyle,
+
+            createdAt:
+              data.created_at,
+
+            updatedAt:
+              data.updated_at
+
+          };
+
+        }
+
+      }
+
+
+      updatePageNumber();
+
+      showSavedMessage();
+
+      displayPages();
+
+    }
+
+
+    /* =========================
+       LOAD PAGE
+    ========================= */
+
+    function loadPage(id) {
+
+      const page =
+        pages.find(
+          p => p.id === id
+        );
+
+      if (!page) return;
+
+      currentPageId =
+        page.id;
+
+      date.innerHTML =
+        page.date || "";
+
+      title.innerHTML =
+        page.title || "";
+
+      content.innerHTML =
+        page.content || "";
+
+      status.value =
+        page.status || "draft";
+
+      tags.value =
+        (page.tags || []).join(", ");
+
+      applyStyle(
+        page.style || defaultStyle
+      );
+
+      updatePageNumber();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+
+
+    function updatePageNumber() {
+
+      const index =
+        pages.findIndex(
+          page =>
+            page.id ===
+            currentPageId
+        );
+
+      document.getElementById(
+        "pageNumber"
+      ).textContent =
+        String(
+          index >= 0
+            ? index + 1
+            : pages.length + 1
+        ).padStart(2, "0");
+
+    }
+
+
+    /* =========================
        DELETE
     ========================= */
 
-    function deleteCurrentPage() {
+    async function deleteCurrentPage() {
 
-      if (
-        currentPageId === null
-      ) {
+      if (currentPageId === null) {
 
         alert(
           "مفيش صفحة محفوظة للحذف."
@@ -1622,18 +1812,40 @@
       if (!confirmed) return;
 
 
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("thoughts")
+          .delete()
+          .eq(
+            "id",
+            currentPageId
+          )
+          .eq(
+            "owner_id",
+            currentUser.id
+          );
+
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          "حصلت مشكلة أثناء الحذف."
+        );
+
+        return;
+
+      }
+
+
       pages =
         pages.filter(
           p =>
-            p.id !==
-            currentPageId
+            p.id !== currentPageId
         );
-
-
-      localStorage.setItem(
-        "thoughtsPages",
-        JSON.stringify(pages)
-      );
 
 
       newPage();
@@ -1681,9 +1893,7 @@
             .toLowerCase();
 
 
-          return text.includes(
-            search
-          );
+          return text.includes(search);
 
         });
 
@@ -1719,21 +1929,17 @@
 
         item.onclick =
           () =>
-            loadPage(
-              page.id
-            );
+            loadPage(page.id);
 
 
         const statusClass =
-          page.status ===
-          "published"
+          page.status === "published"
             ? "published"
             : "draft";
 
 
         const statusText =
-          page.status ===
-          "published"
+          page.status === "published"
             ? "Published"
             : "Draft";
 
@@ -1755,9 +1961,7 @@
                 )}
               </strong>
 
-              <span
-                class="page-status ${statusClass}"
-              >
+              <span class="page-status ${statusClass}">
                 ${statusText}
               </span>
 
@@ -1771,18 +1975,12 @@
           `;
 
 
-        list.appendChild(
-          item
-        );
+        list.appendChild(item);
 
       });
 
     }
 
-
-    /* =========================
-       ESCAPE HTML
-    ========================= */
 
     function escapeHTML(value) {
 
@@ -1799,10 +1997,6 @@
     }
 
 
-    /* =========================
-       SAVED MESSAGE
-    ========================= */
-
     function showSavedMessage() {
 
       const message =
@@ -1810,20 +2004,11 @@
           "savedMessage"
         );
 
-
-      message.classList.add(
-        "show"
-      );
-
+      message.classList.add("show");
 
       setTimeout(
-        () => {
-
-          message.classList.remove(
-            "show"
-          );
-
-        },
+        () =>
+          message.classList.remove("show"),
         1800
       );
 
@@ -1839,18 +2024,18 @@
 
     function autoSave() {
 
-      clearTimeout(
-        autoSaveTimer
-      );
-
+      clearTimeout(autoSaveTimer);
 
       autoSaveTimer =
         setTimeout(
           () => {
 
             if (
-              title.innerHTML.trim() ||
-              content.innerHTML.trim()
+              currentPageId !== null &&
+              (
+                title.innerHTML.trim() ||
+                content.innerHTML.trim()
+              )
             ) {
 
               savePage();
@@ -1892,10 +2077,6 @@
     }
 
 
-    /* =========================
-       ESCAPE
-    ========================= */
-
     document.addEventListener(
       "keydown",
       event => {
@@ -1916,7 +2097,7 @@
 
 
     /* =========================
-       EXPORT BACKUP
+       BACKUP
     ========================= */
 
     function exportBackup() {
@@ -1928,7 +2109,6 @@
           2
         );
 
-
       const blob =
         new Blob(
           [data],
@@ -1938,39 +2118,23 @@
           }
         );
 
-
       const url =
-        URL.createObjectURL(
-          blob
-        );
-
+        URL.createObjectURL(blob);
 
       const a =
-        document.createElement(
-          "a"
-        );
+        document.createElement("a");
 
-
-      a.href =
-        url;
+      a.href = url;
 
       a.download =
         "thoughts-backup.json";
 
-
       a.click();
 
-
-      URL.revokeObjectURL(
-        url
-      );
+      URL.revokeObjectURL(url);
 
     }
 
-
-    /* =========================
-       RESTORE BACKUP
-    ========================= */
 
     function restoreBackup(event) {
 
@@ -1979,13 +2143,11 @@
 
       if (!file) return;
 
-
       const reader =
         new FileReader();
 
-
       reader.onload =
-        e => {
+        async e => {
 
           try {
 
@@ -1996,9 +2158,7 @@
 
 
             if (
-              !Array.isArray(
-                imported
-              )
+              !Array.isArray(imported)
             ) {
 
               throw new Error();
@@ -2008,29 +2168,47 @@
 
             const confirmed =
               confirm(
-                "استرجاع النسخة الاحتياطية هيستبدل الصفحات الحالية. متأكدة؟"
+                "استرجاع النسخة الاحتياطية هيضيف الصفحات إلى حسابك. متأكدة؟"
               );
-
 
             if (!confirmed) return;
 
 
-            pages =
-              imported;
+            for (
+              const page of imported
+            ) {
+
+              await supabaseClient
+                .from("thoughts")
+                .insert({
+
+                  owner_id:
+                    currentUser.id,
+
+                  date:
+                    page.date || "",
+
+                  title:
+                    page.title || "",
+
+                  content:
+                    page.content || "",
+
+                  status:
+                    page.status || "draft",
+
+                  tags:
+                    page.tags || [],
+
+                  style:
+                    page.style || defaultStyle
+
+                });
+
+            }
 
 
-            localStorage.setItem(
-              "thoughtsPages",
-              JSON.stringify(
-                pages
-              )
-            );
-
-
-            newPage();
-
-            displayPages();
-
+            await loadPages();
 
             alert(
               "تم استرجاع النسخة بنجاح ❤️"
@@ -2049,10 +2227,7 @@
         };
 
 
-      reader.readAsText(
-        file
-      );
-
+      reader.readAsText(file);
 
       event.target.value = "";
 
@@ -2063,14 +2238,10 @@
        START
     ========================= */
 
-    displayPages();
-
-    resetStyle();
-
-    newPage();
+    checkAuth();
 
   </script>
 
 </body>
-
 </html>
+```
